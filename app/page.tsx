@@ -1,103 +1,83 @@
-import Image from "next/image";
+// app/page.js
+// This is our main homepage - the first thing users see
+// Think of this as the hospital's main entrance
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 p-8">
+      {/* Main container - like the hospital lobby */}
+      <div className="max-w-4xl mx-auto">
+        {/* Header section - hospital welcome sign */}
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-gray-800 mb-4">
+            🏥 Lief Shift Tracker
+          </h1>
+          <p className="text-xl text-gray-600 mb-8">
+            Healthcare worker shift management made simple and secure
+          </p>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          {/* Status indicator - shows we're building */}
+          <div className="inline-block bg-yellow-100 border border-yellow-300 rounded-lg px-4 py-2">
+            <span className="text-yellow-800 font-semibold">
+              🚧 Under Development - Feature by Feature
+            </span>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        {/* Feature preview cards - what we're building */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Care Worker Card */}
+          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-3">
+              👨‍⚕️ Care Workers
+            </h2>
+            <ul className="text-gray-600 space-y-2">
+              <li>✅ Clock in/out with GPS verification</li>
+              <li>📝 Add optional notes to shifts</li>
+              <li>📍 Location-based shift validation</li>
+              <li>📱 Mobile-friendly interface</li>
+            </ul>
+          </div>
+
+          {/* Manager Card */}
+          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-3">
+              👩‍💼 Managers
+            </h2>
+            <ul className="text-gray-600 space-y-2">
+              <li>👥 View all staff in real-time</li>
+              <li>📊 Shift analytics and reports</li>
+              <li>🎯 Set location perimeters</li>
+              <li>📈 Track attendance patterns</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Development progress tracker */}
+        <div className="mt-12 bg-white rounded-lg shadow-md p-6">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+            🏗️ Development Progress
+          </h3>
+          <div className="space-y-3">
+            <div className="flex items-center">
+              <span className="w-4 h-4 bg-green-500 rounded-full mr-3"></span>
+              <span className="text-gray-700">Project Setup Complete ✅</span>
+            </div>
+            <div className="flex items-center">
+              <span className="w-4 h-4 bg-gray-300 rounded-full mr-3"></span>
+              <span className="text-gray-500">
+                UI Library Integration (Next)
+              </span>
+            </div>
+            <div className="flex items-center">
+              <span className="w-4 h-4 bg-gray-300 rounded-full mr-3"></span>
+              <span className="text-gray-500">
+                Database Setup (Coming Soon)
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }
