@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+   url       = env("DATABASE_URL")    // Pooled connection for app runtime
+  directUrl = env("DIRECT_URL")      // Direct connection for migrations
+}
+
+
+// 🏥 ORGANIZATIONS TABLE
+// Represents hospitals, clinics, or healthcare facilities
+model organizations {
+  id          String   @id @default(cuid()) // Unique identifier for each organization
+  name        String   // Name of the hospital/clinic (e.g., "City General Hospital")
+  address     String?  // Physical address of the facility
+  latitude    Float?   // GPS latitude for location validation
+  longitude   Float?   // GPS longitude for location validation  
+  radius      Int      @default(100) // Allowed radius in meters for clock-in (default: 100m)
+  created_at  DateTime @default(now()) // When organization was added to system
+  updated_at  DateTime @updatedAt // Last time organization details were updated
+
+  // 🔗 RELATIONSHIPS
+  users  users[]  // One organization can have many users (healthcare workers)
+  shifts shifts[] // One organization can have many shifts recorded
+
+  @@map("organizations") // Keep table name consistent with existing Supabase setup
+}
+
+// 👥 USERS TABLE  
+// Represents healthcare workers (nurses, doctors, technicians, etc.)
+model users {
+  id              String   @id @default(cuid()) // Unique identifier for each user
+  email           String   @unique // Email from Auth0 (used for authentication matching)
+  name            String?  // Full name of the healthcare worker
+  role            String   @default("worker") // Role: "worker", "manager", "admin"
+  organization_id String   // Which hospital/facility this user works at
+  active          Boolean  @default(true) // Whether user account is active
+  created_at      DateTime @default(now()) // When user joined the system
+  updated_at      DateTime @updatedAt // Last time user details were updated
+
+  // 🔗 RELATIONSHIPS
+  organization organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+  shifts       shifts[] // One user can have many shifts (work sessions)
+
+  @@map("users") // Keep table name consistent with existing Supabase setup
+}
+
+// ⏰ SHIFTS TABLE
+// Represents individual work sessions (clock-in to clock-out)
+model shifts {
+  id                   String    @id @default(cuid()) // Unique identifier for each shift
+  user_id              String    // Which healthcare worker this shift belongs to
+  organization_id      String    // Which facility this shift was worked at
+  
+  // 🟢 CLOCK-IN DATA
+  clock_in_time        DateTime  // When the worker clocked in (timestamp)
+  clock_in_latitude    Float     // GPS latitude where worker clocked in
+  clock_in_longitude   Float     // GPS longitude where worker clocked in
+  
+  // 🔴 CLOCK-OUT DATA (optional - filled when worker clocks out)
+  clock_out_time       DateTime? // When the worker clocked out (null if still active)
+  clock_out_latitude   Float?    // GPS latitude where worker clocked out
+  clock_out_longitude  Float?    // GPS longitude where worker clocked out
+  
+  // 📝 ADDITIONAL DATA
+  notes                String?   // Optional notes about the shift
+  duration_minutes     Int?      // Calculated shift duration (updated on clock-out)
+  created_at          DateTime  @default(now()) // When shift record was created
+  updated_at          DateTime  @updatedAt // Last time shift was updated
+
+  // 🔗 RELATIONSHIPS
+  user         users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  organization organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+
+  @@map("shifts") // Keep table name consistent with existing Supabase setup
+  
+  // 📊 DATABASE INDEXES (for better query performance)
+  @@index([user_id]) // Fast lookup of shifts by user
+  @@index([organization_id]) // Fast lookup of shifts by organization
+  @@index([clock_in_time]) // Fast lookup of shifts by date
+  @@index([user_id, clock_out_time]) // Fast lookup of active shifts (where clock_out_time is null)
+}
