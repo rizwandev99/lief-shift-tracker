@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@auth0/nextjs-auth0": "^4.9.0",
+    "@auth0/nextjs-auth0": "^4.10.0",
     "@prisma/client": "^6.16.1",
     "@supabase/supabase-js": "^2.57.4",
     "grommet": "^2.48.0",
@@ -18,12 +18,13 @@
     "pg": "^8.16.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "styled-components": "^6.1.19"
+    "styled-components": "^6.1.19",
+    "zod": "^4.1.9"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^20.19.15",
     "@types/pg": "^8.15.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -31,6 +32,7 @@
     "eslint-config-next": "15.5.2",
     "prisma": "^6.16.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
   }
 }
