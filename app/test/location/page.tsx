@@ -5,7 +5,7 @@
 
 import { Box, Heading, Text, Button } from "grommet";
 import { Location, Refresh } from "grommet-icons";
-import { useGeolocation } from "@/hooks/useGeolocation";
+import { useGeolocation } from "@/hooks/use-geolocation";
 
 export default function TestLocationPage() {
   const { location, error, loading, getCurrentLocation } = useGeolocation();

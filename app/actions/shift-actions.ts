@@ -6,7 +6,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getSession } from "@auth0/nextjs-auth0";
+import { auth0 } from "@/lib/auth0";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
 
@@ -61,7 +61,7 @@ function calculateDistance(
  */
 async function getCurrentUser() {
   try {
-    const session = await getSession();
+    const session = await auth0.getSession();
     if (!session?.user?.email) {
       throw new Error("User not authenticated");
     }

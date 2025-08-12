@@ -1,36 +1,31 @@
-// app/page.tsx
-// Simplified Auth0 v4.9.0 approach - NO custom imports needed
-import { Box, Heading, Text, Card, CardBody, Button, Grid, Tag } from "grommet";
-import { Shield, Clock, Analytics, User, Login, Logout } from "grommet-icons";
-import { auth0 } from "@/lib/auth0";
+// app/page.tsx - SERVER COMPONENT for Auth0 v4
+import { auth0 } from "../lib/auth0";
+import ClockInterface from "./components/clock-interface";
 
-export default async function Home() {
-  const session = await auth0.getSession();
-  const user = session?.user;
+export default async function HomePage() {
+  // const session = await auth0.getSession();
+
+  // if (!session) {
+  //   return (
+  //     <main className="flex items-center justify-center min-h-screen">
+  //       <div className="text-center p-8 bg-white rounded-lg shadow-md">
+  //         <h2 className="text-2xl font-bold mb-4">
+  //           🔒 Authentication Required
+  //         </h2>
+  //         <a
+  //           href="/auth/login"
+  //           className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+  //         >
+  //           Log In
+  //         </a>
+  //       </div>
+  //     </main>
+  //   );
+  // }
 
   return (
-    <Box pad="medium" style={{ minHeight: "100vh" }}>
-      <Box direction="row" gap="small" align="center">
-        <Shield size="large" color="brand" />
-        <Heading level="2" margin="none">
-          Lief Shift Tracker
-        </Heading>
-      </Box>
-
-      {user ? (
-        <Box gap="small" margin={{ top: "medium" }}>
-          <Text>Welcome, {user.name}</Text>
-          <a href="/auth/logout">
-            <Button icon={<Logout />} label="Logout" secondary />
-          </a>
-        </Box>
-      ) : (
-        <Box gap="small" margin={{ top: "medium" }}>
-          <a href="/auth/login">
-            <Button icon={<Login />} label="Login" primary />
-          </a>
-        </Box>
-      )}
-    </Box>
+    <main>
+      <ClockInterface />
+    </main>
   );
 }
