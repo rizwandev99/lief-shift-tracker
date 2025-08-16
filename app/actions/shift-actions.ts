@@ -8,7 +8,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth0 } from "@/lib/auth0";
 import prisma from "@/lib/prisma";
-import { z } from "zod";
+import { success, z } from "zod";
+import { ja } from "zod/locales";
 
 // 📋 VALIDATION SCHEMAS - Define what data we expect from the client
 const LocationSchema = z.object({
@@ -316,6 +317,311 @@ export async function getActiveShiftAction() {
       success: false,
       error:
         error instanceof Error ? error.message : "Failed to get active shift",
+    };
+  }
+}
+
+/**
+ * Get Shift History (in Worker Dashboard) - Get user's completed shifts
+ */
+export async function getShiftHistoryAction() {
+  try {
+    const user = await getCurrentUser();
+
+    const shiftHistory = await prisma.shifts.findMany({
+      where: {
+        user_id: user.id,
+        clock_out_time: { not: null }, // Only completed shifts
+      },
+      include: {
+        organization: {
+          select: { name: true, id: true },
+        },
+      },
+      orderBy: {
+        clock_in_time: "desc", // Most recent first
+      },
+      take: 10, // Last 10 shifts
+    });
+
+    return {
+      success: true,
+      shiftHistory,
+    };
+  } catch (error) {
+    console.error("Get shift history error:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to get shift history",
+    };
+  }
+}
+
+/**
+ * Manager Actions - Get all currently clocked-in staff
+ */
+export async function getActiveStaffAction() {
+  try {
+    const user = await getCurrentUser();
+
+    // For now, any authenticated user can be a manager
+    // In production, you'd check user role here
+
+    const activeStaff = await prisma.shifts.findMany({
+      where: {
+        clock_out_time: null, // Currently active shifts
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
+        organization: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        clock_in_time: "desc",
+      },
+    });
+    console.log("Activa", activeStaff);
+    return {
+      success: true,
+      activeStaff,
+    };
+  } catch (error) {
+    console.error("Get active staff error:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to get active staff",
+    };
+  }
+}
+
+/**
+ * Manager Actions - Get all staff shift history
+ */
+export async function getAllStaffHistoryAction() {
+  try {
+    const user = await getCurrentUser();
+
+    const staffHistory = await prisma.shifts.findMany({
+      where: {
+        clock_out_time: { not: null }, // Completed shifts only
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
+        organization: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        clock_out_time: "desc",
+      },
+      take: 50, // Last 50 completed shifts
+    });
+
+    return {
+      success: true,
+      staffHistory,
+    };
+  } catch (error) {
+    console.error("Get all staff history error:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to get staff history",
+    };
+  }
+}
+
+/**
+ * Manager Actions - Get analytics data
+ */
+export async function getAnalyticsAction() {
+  try {
+    const user = await getCurrentUser();
+
+    // Get data for last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    // Total active staff today
+    const activeToday = await prisma.shifts.count({
+      where: {
+        clock_in_time: {
+          gte: new Date(new Date().setHours(0, 0, 0, 0)), // Today
+        },
+        clock_out_time: null,
+      },
+    });
+
+    // Total shifts last 7 days
+    const shiftsLastWeek = await prisma.shifts.findMany({
+      where: {
+        clock_in_time: {
+          gte: sevenDaysAgo,
+        },
+        clock_out_time: { not: null },
+      },
+      include: {
+        user: {
+          select: {
+            email: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    // Calculate average hours per day
+    const totalHours = shiftsLastWeek.reduce((sum, shift) => {
+      if (shift.clock_out_time) {
+        const duration =
+          (new Date(shift.clock_out_time).getTime() -
+            new Date(shift.clock_in_time).getTime()) /
+          (1000 * 60 * 60);
+        return sum + duration;
+      }
+      return sum;
+    }, 0);
+
+    const avgHoursPerDay = totalHours / 7;
+
+    // Daily clock-ins for last 7 days
+    const dailyClockIns = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+
+      const count = await prisma.shifts.count({
+        where: {
+          clock_in_time: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
+        },
+      });
+
+      dailyClockIns.push({
+        date: startOfDay.toDateString(),
+        count,
+      });
+    }
+
+    return {
+      success: true,
+      analytics: {
+        activeToday,
+        avgHoursPerDay: Math.round(avgHoursPerDay * 100) / 100,
+        totalShiftsLastWeek: shiftsLastWeek.length,
+        dailyClockIns,
+        shiftsLastWeek: shiftsLastWeek.slice(0, 10), // Top 10 recent shifts
+      },
+    };
+  } catch (error) {
+    console.error("Get analytics error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to get analytics",
+    };
+  }
+}
+
+/**
+ * Manager Actions - Update organization settings (location perimeter)
+ */
+export async function updateOrganizationSettingsAction(formData: FormData) {
+  try {
+    const user = await getCurrentUser();
+
+    const organizationId = formData.get("organizationId") as string;
+    const radius = parseFloat(formData.get("radius") as string);
+    const latitude = parseFloat(formData.get("latitude") as string);
+    const longitude = parseFloat(formData.get("longitude") as string);
+
+    if (!organizationId || !radius || !latitude || !longitude) {
+      throw new Error("All fields are required");
+    }
+
+    const updatedOrg = await prisma.organizations.update({
+      where: { id: organizationId },
+      data: {
+        latitude,
+        longitude,
+        radius,
+      },
+    });
+
+    revalidatePath("/manager");
+
+    return {
+      success: true,
+      message: `Updated ${updatedOrg.name} location settings`,
+    };
+  } catch (error) {
+    console.error("Update organization error:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to update organization",
+    };
+  }
+}
+
+/* 
+Manager actions - Get organizations details to see for updationg settings
+*/
+
+export async function getOrganizationSettingsAction() {
+  try {
+    const user = await getCurrentUser();
+
+    const organizations = await prisma.organizations.findMany({
+      select: {
+        id: true,
+        name: true,
+        latitude: true,
+        longitude: true,
+        radius: true,
+      },
+      take: 5,
+    });
+
+    return {
+      success: true,
+      organizations,
+    };
+  } catch (error) {
+    console.error("Get organization settings error:", error);
+
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to get organization settings",
     };
   }
 }

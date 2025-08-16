@@ -1,6 +1,5 @@
-// app/components/ClockInterface.tsx
-// Healthcare shift tracker clock interface using YOUR existing code structure
-
+// app/components/clock-interface.tsx
+// Healthcare shift tracker with shift history - Following naming conventions
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,6 +10,7 @@ import {
   clockInAction,
   clockOutAction,
   getActiveShiftAction,
+  getShiftHistoryAction, // Import the new action
 } from "../actions/shift-actions";
 
 interface ActiveShift {
@@ -20,6 +20,17 @@ interface ActiveShift {
     id: string;
     name: string;
   };
+}
+
+interface ShiftHistory {
+  id: string;
+  clock_in_time: Date;
+  clock_out_time: Date | null;
+  organization: {
+    id: string;
+    name: string;
+  };
+  notes?: string | null;
 }
 
 interface ActionResult {
@@ -34,7 +45,7 @@ export default function ClockInterface() {
   // Auth0 user authentication
   const { user, isLoading: userLoading } = useUser();
 
-  // YOUR existing geolocation hook
+  // Your existing geolocation hook
   const {
     location,
     error: locationError,
@@ -44,18 +55,20 @@ export default function ClockInterface() {
 
   // Component state
   const [activeShift, setActiveShift] = useState<ActiveShift | null>(null);
+  const [shiftHistory, setShiftHistory] = useState<ShiftHistory[]>([]); // New state for history
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [actionResult, setActionResult] = useState<ActionResult | null>(null);
   const [notes, setNotes] = useState("");
 
-  // Load active shift when user is ready
+  // Load active shift and history when user is ready
   useEffect(() => {
     if (user && !userLoading) {
       loadActiveShift();
+      loadShiftHistory(); // Load history too
     }
   }, [user, userLoading]);
 
-  // Load active shift using YOUR existing server action
+  // Load active shift using existing server action
   const loadActiveShift = async () => {
     try {
       const result = await getActiveShiftAction();
@@ -67,7 +80,19 @@ export default function ClockInterface() {
     }
   };
 
-  // Clock In using YOUR existing server action and schema fields
+  // Load shift history using new server action
+  const loadShiftHistory = async () => {
+    try {
+      const result = await getShiftHistoryAction();
+      if (result.success && result.shiftHistory) {
+        setShiftHistory(result.shiftHistory);
+      }
+    } catch (error) {
+      console.error("Error loading shift history:", error);
+    }
+  };
+
+  // Clock In using existing server action and schema fields
   const handleClockIn = async () => {
     if (!location?.latitude || !location?.longitude) {
       setActionResult({
@@ -113,7 +138,7 @@ export default function ClockInterface() {
     }
   };
 
-  // Clock Out using YOUR existing server action and schema fields
+  // Clock Out using existing server action and schema fields
   const handleClockOut = async () => {
     if (!location?.latitude || !location?.longitude) {
       setActionResult({
@@ -148,6 +173,8 @@ export default function ClockInterface() {
       if (result.success) {
         setActiveShift(null);
         setNotes("");
+        // Reload history to show the completed shift
+        await loadShiftHistory();
       }
     } catch (error) {
       setActionResult({
@@ -157,6 +184,13 @@ export default function ClockInterface() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Helper function to calculate shift duration
+  const calculateShiftDuration = (clockIn: Date, clockOut: Date): number => {
+    const durationMs =
+      new Date(clockOut).getTime() - new Date(clockIn).getTime();
+    return Math.round((durationMs / (1000 * 60 * 60)) * 100) / 100; // Hours with 2 decimal places
   };
 
   // Loading state
@@ -205,7 +239,7 @@ export default function ClockInterface() {
           <p className="text-gray-600">Welcome, {user.name || user.email}</p>
         </div>
 
-        {/* Location Status - Using YOUR hook structure */}
+        {/* Location Status */}
         <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-gray-700">📍 Location Status</h3>
@@ -342,6 +376,62 @@ export default function ClockInterface() {
           )}
         </div>
 
+        {/* NEW: Shift History Section */}
+        {shiftHistory.length > 0 && (
+          <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h3 className="font-semibold text-blue-800 mb-4 flex items-center">
+              📊 Recent Shifts ({shiftHistory.length})
+            </h3>
+
+            <div className="space-y-3 max-h-64 overflow-y-auto">
+              {shiftHistory.map((shift) => (
+                <div
+                  key={shift.id}
+                  className="p-3 bg-white rounded-lg border border-blue-100 hover:border-blue-300 transition-colors"
+                >
+                  {/* Organization and Date */}
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-medium text-gray-800 text-sm">
+                      {shift.organization.name}
+                    </h4>
+                    <span className="text-xs text-gray-500">
+                      {new Date(shift.clock_in_time).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  {/* Time Range */}
+                  <div className="text-xs text-gray-600 mb-2">
+                    <span className="inline-block mr-3">
+                      ⏰ {new Date(shift.clock_in_time).toLocaleTimeString()} -{" "}
+                      {new Date(shift.clock_out_time!).toLocaleTimeString()}
+                    </span>
+                  </div>
+
+                  {/* Duration */}
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-blue-600 font-medium">
+                      ⏱️ Duration:{" "}
+                      {calculateShiftDuration(
+                        shift.clock_in_time,
+                        shift.clock_out_time!
+                      )}
+                      h
+                    </span>
+                    {shift.notes && <span className="text-gray-400">📝</span>}
+                  </div>
+
+                  {/* Notes (if any) */}
+                  {shift.notes && (
+                    <div className="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600">
+                      💬 {shift.notes}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Help Text */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
@@ -350,7 +440,7 @@ export default function ClockInterface() {
               : "You must be at your work location to clock out successfully."}
           </p>
         </div>
-        {/* <pre className="text-gray-800">{JSON.stringify(user, null, 2)}</pre> */}
+
         {/* Development Debug Info */}
         {process.env.NODE_ENV === "development" && (
           <div className="mt-6 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
@@ -368,6 +458,7 @@ export default function ClockInterface() {
                   : "None"}
               </p>
               <p>Active Shift: {activeShift?.id || "None"}</p>
+              <p>History Count: {shiftHistory.length}</p>
             </div>
           </div>
         )}

@@ -26,6 +26,14 @@ export default async function HomePage() {
   return (
     <main>
       <ClockInterface />
+      <div className="mt-6 flex justify-center">
+        <a
+          href="/manager"
+          className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+        >
+          👨‍💼 Manager Dashboard
+        </a>
+      </div>
     </main>
   );
 }
