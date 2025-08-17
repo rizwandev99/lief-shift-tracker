@@ -6,7 +6,9 @@
   - [Table of Contents Maintenance](#table-of-contents-maintenance)
   - [Rule Modification Policy](#rule-modification-policy)
   - [Categorization Requirement](#categorization-requirement)
+  - [Rule Organization Guidelines](#rule-organization-guidelines)
 - [Git Rules](#git-rules)
+  - [Synchronization After Commit](#synchronization-after-commit)
 - [Context Management](#context-management)
   - [Auto-Context Creation and Maintenance](#auto-context-creation-and-maintenance)
   - [Initial Setup](#initial-setup)
@@ -16,9 +18,15 @@
 ## Rule Organization
 
 ### Table of Contents Maintenance
+### Rule Organization Guidelines
+
+When organizing rules, first review all existing categories. If a relevant category exists (e.g., "Git Rules" for Git-related commands, operations, or tools like log, add, commit, push, status, or content insertion via tools), add the new rule directly inside that category in a hierarchical manner. If no suitable category is found, create a new category in agents.md file and place the rule there, ensuring the structure remains hierarchical (e.g., top-level categories like "Git Rules" or "General Rules", with subcategories as needed). Always prioritize existing categories before creating new ones, and maintain logical hierarchy based on the context of previous interactions, such as Git workflows, tool usages, or content modifications.
 
 At the beginning of each interaction, generate and insert a table of contents at the top of AGENTS.md (immediately after the main title) to facilitate easy navigation. This table of contents should list all main sections (e.g., ## headings) and subsections (e.g., ### headings) with hyperlinks to their locations in the file. Automatically update and regenerate this table of contents whenever the contents of AGENTS.md are modified, ensuring it remains accurate and current. Use Markdown format for the table of contents, such as:
 
+### Synchronization After Commit
+
+After committing changes (such as adding AGENTS.md and context.md, updating shift actions and components, and deleting custom rules), synchronize from both sides by pulling from the remote repository and then pushing the committed changes to ensure both local and remote are up-to-date. If merge conflicts arise during the pull operation, resolve them by editing the conflicting files, then add and commit the resolutions before pushing.
 - [Section Name](#section-name)
 - [Subsection Name](#subsection-name)
 
