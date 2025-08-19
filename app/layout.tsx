@@ -16,6 +16,9 @@ interface RootLayoutProps {
 export const metadata = {
   title: "Lief Shift Tracker - Healthcare Management",
   description: "Professional shift tracking for healthcare workers",
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 // Properly typed layout component

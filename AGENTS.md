@@ -14,6 +14,8 @@
   - [Initial Setup](#initial-setup)
   - [Maintenance Requirements](#maintenance-requirements)
   - [Update Triggers](#update-triggers)
+- [File and Asset Management](#file-and-asset-management)
+  - [File Verification](#file-verification)
 
 ## Rule Organization
 
@@ -107,5 +109,11 @@ Update `context.md` when:
 - Integration points are established.
 
 You have to ensure **consistent, informed development** without losing project knowledge between sessions.
+
+## File and Asset Management
+
+### File Verification
+
+Always verify file names, extensions, and paths in the project directory before referencing them in code to prevent broken links, missing assets, or runtime errors. Use directory listing tools to confirm exact filenames before implementing asset references.
 
 ---
