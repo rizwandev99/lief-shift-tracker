@@ -25,7 +25,7 @@ export const metadata = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body>
+      <body suppressHydrationWarning>
         <GrommetProvider>{children}</GrommetProvider>
       </body>
     </html>
