@@ -33,7 +33,12 @@ export default function TestDatabase() {
   }, []);
 
   return (
-    <Box pad="medium" align="center">
+    <Box
+      style={{ minHeight: "100vh" }}
+      align="center"
+      justify="center"
+      pad="medium"
+    >
       <Heading level="2">Database Connection Test</Heading>
       <Text size="large">{connectionStatus}</Text>
     </Box>

@@ -1,23 +1,24 @@
-// app/layout.js
-// Root layout - sets up the basic HTML structure
+// app/layout.tsx
 import "./globals.css";
 import { GrommetProvider } from "./components/GrommetProvider";
+import { ReactNode } from "react";
 
-// App metadata (shows in browser tab)
+// TypeScript interface for props
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+// App metadata
 export const metadata = {
   title: "Lief Shift Tracker - Healthcare Management",
   description: "Professional shift tracking for healthcare workers",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+// Properly typed layout component
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body>
-        {/* Wrap everything in our Grommet theme provider */}
         <GrommetProvider>{children}</GrommetProvider>
       </body>
     </html>
