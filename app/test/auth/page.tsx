@@ -1,22 +1,23 @@
 export const dynamic = "force-dynamic"; // Add to your page
-// app/test-auth/page.tsx
-// Clean, simple authentication test page using your working pattern
 
-import { Box, Heading, Text, Button, Card, CardBody } from "grommet";
-import {
-  Lock,
-  Login,
-  Logout,
-  User,
-  FormCheckmark,
-  StatusInfo,
-} from "grommet-icons";
+// app/test/auth/page.tsx
+// Using environment variable for base URL - cleaner approach
+
+import { Box, Heading, Text, Button } from "grommet";
+import { Lock, Login, Logout, User } from "grommet-icons";
 import { auth0 } from "@/lib/auth0";
 
 export default async function TestAuthPage() {
-  // Same pattern as your homepage
   const session = await auth0.getSession();
   const user = session?.user;
+
+  // Get base URL from environment variable, fallback to localhost
+  const baseUrl =
+    process.env.AUTH0_BASE_URL ||
+    process.env.APP_BASE_URL ||
+    "http://localhost:3000";
+  const returnPath = "/test/auth";
+  const fullReturnUrl = `${baseUrl}${returnPath}`;
 
   return (
     <Box
@@ -26,68 +27,86 @@ export default async function TestAuthPage() {
       align="center"
       justify="center"
       style={{ minHeight: "100vh" }}
+      gap="medium"
     >
-      {/* Page Header */}
-      <Box align="center" margin={{ bottom: "large" }}>
-        <Lock size="xlarge" color="brand" />
-        <Heading level="2" margin="small">
+      {/* Header */}
+      <Box align="center" gap="small">
+        <Lock size="large" color="brand" />
+        <Heading level="2" margin="none">
           🔐 Auth Test
         </Heading>
-        <Text size="medium" color="text-weak" textAlign="center">
-          Simple authentication testing page
-        </Text>
       </Box>
 
-      {/* Authentication Status */}
-      <Card background="white" elevation="small" width="large">
-        <CardBody pad="medium">
+      {/* Auth Status */}
+      <Box align="center" gap="medium" width="medium">
+        {user ? (
           <Box align="center" gap="medium">
-            {user ? (
-              <Box align="center" gap="medium">
-                <FormCheckmark size="large" color="status-ok" />
-                <Text size="large" weight="bold" color="status-ok">
-                  ✅ Authenticated
-                </Text>
-                <Box align="center" gap="small">
-                  <Text>
-                    <strong>Name:</strong> {user.name}
-                  </Text>
-                  <Text>
-                    <strong>Email:</strong> {user.email}
-                  </Text>
-                </Box>
-                <a href="/auth/logout">
-                  <Button icon={<Logout />} label="Logout" secondary />
-                </a>
-              </Box>
-            ) : (
-              <Box align="center" gap="medium">
-                <StatusInfo size="large" color="text-weak" />
-                <Text size="large" weight="bold">
-                  Not Authenticated
-                </Text>
-                <Text size="small" color="text-weak">
-                  Click login to test authentication
-                </Text>
-                <a href="/auth/login">
-                  <Button icon={<Login />} label="Login" primary />
-                </a>
-              </Box>
-            )}
-          </Box>
-        </CardBody>
-      </Card>
+            <Box
+              background="status-ok"
+              pad="medium"
+              round="small"
+              align="center"
+              gap="small"
+            >
+              <Text size="large" weight="bold" color="white">
+                ✅ Authenticated
+              </Text>
+              <Text color="white">
+                <strong>Name:</strong> {user.name}
+              </Text>
+              <Text color="white">
+                <strong>Email:</strong> {user.email}
+              </Text>
+            </Box>
 
-      {/* Navigation */}
-      <Box direction="row" gap="small" margin={{ top: "medium" }}>
-        <a href="/">
-          <Button label="Home" />
-        </a>
-        <a href="/test-db">
-          <Button label="Test DB" />
-        </a>
-        <a href="/test-location">
-          <Button label="Test Location" />
+            {/* Logout - using environment variable + path */}
+            <a
+              href={`/auth/logout?returnTo=${encodeURIComponent(
+                fullReturnUrl
+              )}`}
+              style={{ textDecoration: "none" }}
+            >
+              <Button
+                icon={<Logout />}
+                label="Test Logout"
+                secondary
+                size="large"
+              />
+            </a>
+          </Box>
+        ) : (
+          <Box align="center" gap="medium">
+            <Box
+              background="status-unknown"
+              pad="medium"
+              round="small"
+              align="center"
+            >
+              <Text size="large" weight="bold" color="white">
+                ❌ Not Authenticated
+              </Text>
+              <Text color="white" size="small" textAlign="center">
+                Click login to test authentication flow
+              </Text>
+            </Box>
+
+            {/* Login - using environment variable + path */}
+            <a
+              href={`/auth/login?returnTo=${encodeURIComponent(fullReturnUrl)}`}
+              style={{ textDecoration: "none" }}
+            >
+              <Button
+                icon={<Login />}
+                label="Test Login"
+                primary
+                size="large"
+              />
+            </a>
+          </Box>
+        )}
+
+        <a href="/test" style={{ textDecoration: "none" }}>
+          <Button label="← Back to Test Hub" />
         </a>
       </Box>
     </Box>
