@@ -238,7 +238,7 @@ export default function ClockInterface() {
               🏥 Healthcare Shift Tracker
             </h1>
             <a
-              href="/api/auth/logout"
+              href="/auth/logout"
               className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm transition-colors"
             >
               🚪 Logout
