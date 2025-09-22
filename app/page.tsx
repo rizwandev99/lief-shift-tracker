@@ -10,33 +10,24 @@ export default async function HomePage() {
 
    // If user is authenticated, redirect based on role
    if (session?.user) {
-     try {
-       // Import prisma client dynamically to avoid SSR issues
-       const { default: prisma } = await import("@/lib/prisma");
-       const user = await prisma.users.findUnique({
-         where: { email: session.user.email },
-         select: { role: true },
-       });
+     // Import prisma client dynamically to avoid SSR issues
+     const { default: prisma } = await import("@/lib/prisma");
+     const user = await prisma.users.findUnique({
+       where: { email: session.user.email },
+       select: { role: true },
+     });
 
-       if (user?.role === "manager" || user?.role === "admin") {
-         redirect("/manager");
-       } else {
-         // Workers and default role go to worker dashboard
-         return (
-           <main>
-             <ClockInterface />
-           </main>
-         );
-       }
-     } catch (error) {
-       console.error("Error fetching user role:", error);
-       // Fallback to worker interface if role check fails
-       return (
-         <main>
-           <ClockInterface />
-         </main>
-       );
+     if (user?.role === "manager" || user?.role === "admin") {
+       // Redirect managers to manager dashboard
+       redirect("/manager");
      }
+     
+     // Workers go to worker dashboard
+     return (
+       <main>
+         <ClockInterface />
+       </main>
+     );
    }
 
   // Landing page for unauthenticated users

@@ -112,15 +112,17 @@ export default function ManagerDashboard() {
         return;
       }
 
-      // Import prisma client dynamically to avoid SSR issues
-      const { default: prisma } = await import('@/lib/prisma');
-      const dbUser = await prisma.users.findUnique({
-        where: { email: userEmail },
-        select: { role: true },
+      // Call server action to check user role instead of using Prisma directly
+      const response = await fetch('/api/check-user-role', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail }),
       });
 
-      if (dbUser && (dbUser.role === 'manager' || dbUser.role === 'admin')) {
-        setUserRole(dbUser.role);
+      const data = await response.json();
+
+      if (data.success && (data.role === 'manager' || data.role === 'admin')) {
+        setUserRole(data.role);
       } else {
         // Redirect non-managers
         window.location.href = '/';
@@ -362,12 +364,6 @@ export default function ManagerDashboard() {
               >
                 🔄 Refresh Data
               </button>
-              <a
-                href="/"
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                👤 Care Worker View
-              </a>
               <a
                 href="/api/auth/logout"
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
