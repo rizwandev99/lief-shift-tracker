@@ -365,7 +365,7 @@ export default function ManagerDashboard() {
                 🔄 Refresh Data
               </button>
               <a
-                href="/api/auth/logout"
+                href="/auth/logout"
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
               >
                 🚪 Logout

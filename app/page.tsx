@@ -20,14 +20,10 @@ export default async function HomePage() {
      if (user?.role === "manager" || user?.role === "admin") {
        // Redirect managers to manager dashboard
        redirect("/manager");
+     } else {
+       // Redirect workers to worker dashboard
+       redirect("/worker");
      }
-     
-     // Workers go to worker dashboard
-     return (
-       <main>
-         <ClockInterface />
-       </main>
-     );
    }
 
   // Landing page for unauthenticated users
