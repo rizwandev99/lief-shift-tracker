@@ -346,9 +346,14 @@ export default function ManagerDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                👨‍💼 Manager Dashboard
-              </h1>
+              <div className="flex items-center space-x-2 mb-2">
+                <img
+                  src="/lief-logo-with-name.svg"
+                  alt="Lief Logo"
+                  className="h-8 w-auto"
+                />
+                <span className="text-sm text-gray-500">Manager Dashboard</span>
+              </div>
               <p className="text-gray-600">
                 Welcome,{" "}
                 {formatUserName({

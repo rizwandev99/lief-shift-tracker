@@ -33,10 +33,11 @@ export default async function HomePage() {
       <header className="relative z-10 px-4 py-6 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">L</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">Lief</span>
+            <img
+              src="/lief-logo-with-name.svg"
+              alt="Lief Logo"
+              className="h-8 w-auto"
+            />
           </div>
           <div className="flex items-center space-x-8">
             <nav className="hidden md:flex space-x-8">
@@ -135,10 +136,11 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">L</span>
-                </div>
-                <span className="text-xl font-bold">Lief</span>
+                <img
+                  src="/lief-logo-with-name.svg"
+                  alt="Lief Logo"
+                  className="h-8 w-auto"
+                />
               </div>
               <p className="text-gray-400">
                 Revolutionizing healthcare workforce management with innovative technology.

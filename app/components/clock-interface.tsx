@@ -234,9 +234,14 @@ export default function ClockInterface() {
         {/* Header */}
         <div className="text-center mb-6">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold text-gray-800">
-              🏥 Healthcare Shift Tracker
-            </h1>
+            <div className="flex items-center space-x-2">
+              <img
+                src="/lief-logo-with-name.svg"
+                alt="Lief Logo"
+                className="h-8 w-auto"
+              />
+              <span className="text-sm text-gray-500">Healthcare Shift Tracker</span>
+            </div>
             <a
               href="/auth/logout"
               className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm transition-colors"
