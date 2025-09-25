@@ -196,9 +196,9 @@ export default function ClockInterface() {
   // Loading state
   if (userLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -208,17 +208,17 @@ export default function ClockInterface() {
   // Authentication required
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-md">
-          <h2 className="text-2xl text-gray-800 font-bold mb-4">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50">
+        <div className="text-center p-8 bg-white rounded-2xl shadow-xl max-w-md border border-emerald-100">
+          <h2 className="text-2xl text-emerald-800 font-bold mb-4">
             🔒 Authentication Required
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-emerald-700 mb-6 leading-relaxed">
             Please log in to access the healthcare shift tracker.
           </p>
           <a
             href="/auth/login"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+            className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-emerald-200/50"
           >
             Log In to Continue
           </a>
@@ -229,8 +229,8 @@ export default function ClockInterface() {
 
   // Main interface
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 py-8">
+      <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-xl border border-emerald-100">
         {/* Header */}
         <div className="text-center mb-6">
           <div className="flex justify-between items-center mb-4">
@@ -240,26 +240,28 @@ export default function ClockInterface() {
                 alt="Lief Logo"
                 className="h-8 w-auto"
               />
-              <span className="text-sm text-gray-500">Healthcare Shift Tracker</span>
+              <span className="text-sm text-gray-500">
+                Healthcare Shift Tracker
+              </span>
             </div>
             <a
               href="/auth/logout"
-              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm transition-colors"
+              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm transition-all duration-300 hover:shadow-lg hover:shadow-red-200/50"
             >
               🚪 Logout
             </a>
           </div>
-          <p className="text-gray-600">Welcome, {user.name || user.email}</p>
+          <p className="text-emerald-700 font-medium">Welcome, {user.name || user.email}</p>
         </div>
 
         {/* Location Status */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+        <div className="mb-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-gray-700">📍 Location Status</h3>
+            <h3 className="font-semibold text-emerald-800">📍 Location Status</h3>
             <button
               onClick={getCurrentLocation}
               disabled={locationLoading}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium disabled:opacity-50"
+              className="text-emerald-600 hover:text-emerald-800 text-sm font-medium disabled:opacity-50 transition-colors duration-300"
             >
               {locationLoading ? "Getting..." : "Get Location"}
             </button>
@@ -275,13 +277,13 @@ export default function ClockInterface() {
           ) : location ? (
             <div className="text-green-600">
               <p className="font-medium">✅ Location Ready</p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-emerald-600 mt-1 font-medium">
                 Lat: {location.latitude.toFixed(4)}, Lng:{" "}
                 {location.longitude.toFixed(4)}
               </p>
             </div>
           ) : (
-            <p className="text-gray-600">
+            <p className="text-emerald-700">
               Click "Get Location" to enable location access
             </p>
           )}
@@ -289,11 +291,11 @@ export default function ClockInterface() {
 
         {/* Active Shift Status */}
         {activeShift && (
-          <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
-            <h3 className="font-semibold text-green-800 mb-2">
+          <div className="mb-6 p-4 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border border-emerald-200">
+            <h3 className="font-semibold text-emerald-800 mb-2">
               🕐 Current Shift
             </h3>
-            <div className="text-green-700">
+            <div className="text-emerald-700">
               <p className="font-medium">{activeShift.organization.name}</p>
               <p className="text-sm">
                 Started: {new Date(activeShift.clock_in_time).toLocaleString()}
@@ -315,7 +317,7 @@ export default function ClockInterface() {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Add any notes about your shift..."
-            className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none transition-all duration-300"
             rows={3}
             maxLength={500}
           />
@@ -352,10 +354,10 @@ export default function ClockInterface() {
             <button
               onClick={handleClockIn}
               disabled={isSubmitting || locationLoading || !location}
-              className={`w-full py-4 px-4 rounded-lg font-bold text-white text-lg transition-all duration-200 ${
+              className={`w-full py-4 px-4 rounded-lg font-bold text-white text-lg transition-all duration-300 ${
                 isSubmitting || locationLoading || !location
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-600 hover:bg-green-700 active:bg-green-800 hover:shadow-lg"
+                  : "bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 hover:shadow-lg hover:shadow-emerald-200/50"
               }`}
             >
               {isSubmitting ? (
@@ -371,10 +373,10 @@ export default function ClockInterface() {
             <button
               onClick={handleClockOut}
               disabled={isSubmitting || locationLoading || !location}
-              className={`w-full py-4 px-4 rounded-lg font-bold text-white text-lg transition-all duration-200 ${
+              className={`w-full py-4 px-4 rounded-lg font-bold text-white text-lg transition-all duration-300 ${
                 isSubmitting || locationLoading || !location
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-red-600 hover:bg-red-700 active:bg-red-800 hover:shadow-lg"
+                  : "bg-red-600 hover:bg-red-700 active:bg-red-800 hover:shadow-lg hover:shadow-red-200/50"
               }`}
             >
               {isSubmitting ? (
@@ -391,8 +393,8 @@ export default function ClockInterface() {
 
         {/* NEW: Shift History Section */}
         {shiftHistory.length > 0 && (
-          <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <h3 className="font-semibold text-blue-800 mb-4 flex items-center">
+          <div className="mt-8 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200">
+            <h3 className="font-semibold text-emerald-800 mb-4 flex items-center">
               📊 Recent Shifts ({shiftHistory.length})
             </h3>
 
@@ -400,20 +402,20 @@ export default function ClockInterface() {
               {shiftHistory.map((shift) => (
                 <div
                   key={shift.id}
-                  className="p-3 bg-white rounded-lg border border-blue-100 hover:border-blue-300 transition-colors"
+                  className="p-3 bg-white rounded-lg border border-emerald-100 hover:border-emerald-300 transition-all duration-300 hover:shadow-md"
                 >
                   {/* Organization and Date */}
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium text-gray-800 text-sm">
                       {shift.organization.name}
                     </h4>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-emerald-600 font-medium">
                       {new Date(shift.clock_in_time).toLocaleDateString()}
                     </span>
                   </div>
 
                   {/* Time Range */}
-                  <div className="text-xs text-gray-600 mb-2">
+                  <div className="text-xs text-emerald-700 mb-2">
                     <span className="inline-block mr-3">
                       ⏰ {new Date(shift.clock_in_time).toLocaleTimeString()} -{" "}
                       {new Date(shift.clock_out_time!).toLocaleTimeString()}
@@ -422,7 +424,7 @@ export default function ClockInterface() {
 
                   {/* Duration */}
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-blue-600 font-medium">
+                    <span className="text-emerald-600 font-medium">
                       ⏱️ Duration:{" "}
                       {calculateShiftDuration(
                         shift.clock_in_time,
@@ -435,7 +437,7 @@ export default function ClockInterface() {
 
                   {/* Notes (if any) */}
                   {shift.notes && (
-                    <div className="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600">
+                    <div className="mt-2 p-2 bg-emerald-50 rounded-lg text-xs text-emerald-700 border border-emerald-200">
                       💬 {shift.notes}
                     </div>
                   )}
@@ -447,7 +449,7 @@ export default function ClockInterface() {
 
         {/* Help Text */}
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-emerald-700 font-medium">
             {!activeShift
               ? "Ensure you are at your assigned healthcare facility before clocking in."
               : "You must be at your work location to clock out successfully."}
@@ -456,11 +458,11 @@ export default function ClockInterface() {
 
         {/* Development Debug Info */}
         {process.env.NODE_ENV === "development" && (
-          <div className="mt-6 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-            <p className="text-xs font-medium text-yellow-800 mb-1">
+          <div className="mt-6 p-3 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200">
+            <p className="text-xs font-medium text-emerald-800 mb-1">
               Development Debug:
             </p>
-            <div className="text-xs text-yellow-700 space-y-1">
+            <div className="text-xs text-emerald-700 space-y-1">
               <p>User: {user.email}</p>
               <p>
                 Location:{" "}
