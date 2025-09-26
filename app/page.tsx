@@ -71,35 +71,42 @@ export default async function HomePage() {
           </div>
 
           {/* Features Grid */}
-          <div id="features" className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center mb-6">
-                <span className="text-emerald-600 text-3xl">🌱</span>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Location Verification</h3>
-              <p className="text-gray-600 leading-relaxed">
-                GPS-based geofencing ensures staff are at their assigned locations during clock-in and clock-out.
-              </p>
+          <div id="features" className="mt-20">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">Why Choose Lief?</h2>
+              <p className="text-gray-600 text-lg max-w-2xl mx-auto">Discover the features that make healthcare shift tracking effortless and reliable</p>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center mb-6">
-                <span className="text-emerald-600 text-3xl">🌿</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-emerald-200 group">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-3xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-emerald-600 text-4xl">🌱</span>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4 group-hover:text-emerald-800 transition-colors duration-300">Location Verification</h3>
+                <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                  GPS-based geofencing ensures staff are at their assigned locations during clock-in and clock-out.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Real-time Tracking</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Monitor active shifts, track working hours, and manage staff schedules in real-time.
-              </p>
-            </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-2xl flex items-center justify-center mb-6">
-                <span className="text-emerald-600 text-3xl">🌳</span>
+              <div className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-emerald-200 group">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-3xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-emerald-600 text-4xl">🌿</span>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4 group-hover:text-emerald-800 transition-colors duration-300">Real-time Tracking</h3>
+                <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                  Monitor active shifts, track working hours, and manage staff schedules in real-time.
+                </p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Analytics Dashboard</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Comprehensive analytics and reporting tools for managers to optimize workforce management.
-              </p>
+
+              <div className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-emerald-200 group">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-3xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-emerald-600 text-4xl">🌳</span>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4 group-hover:text-emerald-800 transition-colors duration-300">Analytics Dashboard</h3>
+                <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                  Comprehensive analytics and reporting tools for managers to optimize workforce management.
+                </p>
+              </div>
             </div>
           </div>
 
