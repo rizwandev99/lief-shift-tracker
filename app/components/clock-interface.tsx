@@ -246,7 +246,7 @@ export default function ClockInterface() {
             </div>
             <a
               href="/auth/logout"
-              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm transition-all duration-300 hover:shadow-lg hover:shadow-red-200/50"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-lg text-sm transition-all duration-300 hover:shadow-lg hover:shadow-emerald-200/50"
             >
               🚪 Logout
             </a>
@@ -273,7 +273,7 @@ export default function ClockInterface() {
               Getting your location...
             </div>
           ) : locationError ? (
-            <p className="text-red-600">❌ {locationError}</p>
+            <p className="text-red-500">❌ {locationError}</p>
           ) : location ? (
             <div className="text-green-600">
               <p className="font-medium">✅ Location Ready</p>
@@ -332,12 +332,12 @@ export default function ClockInterface() {
           <div
             className={`mb-6 p-4 rounded-lg border ${
               actionResult.success
-                ? "bg-green-50 border-green-200 text-green-800"
-                : "bg-red-50 border-red-200 text-red-800"
+                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                : "bg-orange-50 border-orange-200 text-orange-800"
             }`}
           >
             <p className="font-medium">
-              {actionResult.success ? "✅" : "❌"}{" "}
+              {actionResult.success ? "✅" : "⚠️"}{" "}
               {actionResult.message || actionResult.error}
             </p>
             {actionResult.shiftDuration && (
@@ -376,7 +376,7 @@ export default function ClockInterface() {
               className={`w-full py-4 px-4 rounded-lg font-bold text-white text-lg transition-all duration-300 ${
                 isSubmitting || locationLoading || !location
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-red-600 hover:bg-red-700 active:bg-red-800 hover:shadow-lg hover:shadow-red-200/50"
+                  : "bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 hover:shadow-lg hover:shadow-emerald-200/50"
               }`}
             >
               {isSubmitting ? (
@@ -385,7 +385,7 @@ export default function ClockInterface() {
                   Clocking Out...
                 </div>
               ) : (
-                "🔴 Clock Out"
+                "🟢 Clock Out"
               )}
             </button>
           )}

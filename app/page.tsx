@@ -68,6 +68,57 @@ export default async function HomePage() {
             <div className="flex justify-center">
               <LoginForm />
             </div>
+
+            {/* Demo Credentials */}
+            <div className="mt-8 max-w-2xl mx-auto">
+              <div className="text-center mb-6">
+                <p className="text-sm text-gray-600 mb-4">💡 Try the app with these demo accounts:</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Worker Demo */}
+                <div className="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm">
+                  <div className="flex items-center mb-2">
+                    <span className="text-emerald-600 text-lg mr-2">👩‍⚕️</span>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Healthcare Worker</p>
+                      <p className="text-xs text-emerald-600">Clock in/out & view shifts</p>
+                    </div>
+                  </div>
+                  <div className="text-xs space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Email:</span>
+                      <code className="bg-emerald-50 px-1 py-0.5 rounded text-emerald-700">alice.johnson@citygeneral.com</code>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Password:</span>
+                      <code className="bg-emerald-50 px-1 py-0.5 rounded text-emerald-700">Alice1234$</code>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Manager Demo */}
+                <div className="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm">
+                  <div className="flex items-center mb-2">
+                    <span className="text-emerald-600 text-lg mr-2">👨‍⚕️</span>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Manager</p>
+                      <p className="text-xs text-emerald-600">Analytics & staff management</p>
+                    </div>
+                  </div>
+                  <div className="text-xs space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Email:</span>
+                      <code className="bg-emerald-50 px-1 py-0.5 rounded text-emerald-700">robert.smith@citygeneral.com</code>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Password:</span>
+                      <code className="bg-emerald-50 px-1 py-0.5 rounded text-emerald-700">Robert1234$</code>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Features Grid */}
@@ -110,6 +161,7 @@ export default async function HomePage() {
             </div>
           </div>
 
+
           {/* Stats Section */}
           <div className="mt-20 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-3xl shadow-lg p-10 border border-emerald-100">
             <div className="text-center mb-10">
@@ -140,74 +192,23 @@ export default async function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-16 mt-20">
+      <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-8 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="md:col-span-2">
-              <div className="flex items-center space-x-3 mb-6">
-                <img
-                  src="/lief-logo-with-name.svg"
-                  alt="Lief Logo"
-                  className="h-10 w-auto"
-                />
-              </div>
-              <p className="text-gray-300 text-lg leading-relaxed mb-6">
-                Revolutionizing healthcare workforce management with innovative technology.
-                Our platform ensures seamless shift tracking and location verification for healthcare professionals.
-              </p>
-              <div className="flex space-x-4">
-                <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">🌱</span>
-                </div>
-                <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">🌿</span>
-                </div>
-                <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">🌳</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4 text-emerald-400">Product</h4>
-              <ul className="space-y-3 text-gray-300">
-                <li><a href="#" className="hover:text-emerald-400 transition-colors duration-300">Features</a></li>
-                <li><a href="#" className="hover:text-emerald-400 transition-colors duration-300">Pricing</a></li>
-                <li><a href="#" className="hover:text-emerald-400 transition-colors duration-300">Security</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4 text-emerald-400">Company</h4>
-              <ul className="space-y-3 text-gray-300">
-                <li><a href="#" className="hover:text-emerald-400 transition-colors duration-300">About</a></li>
-                <li><a href="#" className="hover:text-emerald-400 transition-colors duration-300">Careers</a></li>
-                <li><a href="#" className="hover:text-emerald-400 transition-colors duration-300">Contact</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4 text-emerald-400">Support</h4>
-              <ul className="space-y-3 text-gray-300">
-                <li><a href="#" className="hover:text-emerald-400 transition-colors duration-300">Help Center</a></li>
-                <li><a href="#" className="hover:text-emerald-400 transition-colors duration-300">Documentation</a></li>
-                <li><a href="#" className="hover:text-emerald-400 transition-colors duration-300">Status</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-700 mt-12 pt-8 text-center">
-            <div className="flex items-center justify-center space-x-2 mb-4">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="flex items-center space-x-3 mb-4 md:mb-0">
               <img
                 src="/lief-logo-with-name.svg"
                 alt="Lief Logo"
-                className="h-6 w-auto opacity-75"
+                className="h-8 w-auto"
               />
-              <span className="text-gray-400">&copy; 2025 Lief Healthcare. All rights reserved.</span>
+              <span className="text-gray-300 text-sm">&copy; 2025 Lief Healthcare. All rights reserved.</span>
             </div>
-            <p className="text-gray-500 text-sm">
-              Built with care for healthcare professionals • Made with 🌱 nature-inspired design
-            </p>
+
+            <div className="flex items-center space-x-6">
+              <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors text-sm">About</a>
+              <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors text-sm">Contact</a>
+              <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors text-sm">Support</a>
+            </div>
           </div>
         </div>
       </footer>

@@ -300,15 +300,15 @@ export default function ManagerDashboard() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-md">
-          <h2 className="text-2xl text-red-800 font-bold mb-4">
+          <h2 className="text-2xl text-orange-800 font-bold mb-4">
             ⚠️ Connection Error
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-emerald-700 mb-6 leading-relaxed">
             Unable to verify your account permissions. Please try logging in again.
           </p>
           <a
             href="/auth/login"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+            className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-emerald-200/50"
           >
             Log In Again
           </a>
@@ -321,16 +321,16 @@ export default function ManagerDashboard() {
   if (!user || !userRole) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-md">
-          <h2 className="text-2xl text-gray-800 font-bold mb-4">
+        <div className="text-center p-8 bg-white rounded-2xl shadow-xl max-w-md border border-emerald-100">
+          <h2 className="text-2xl text-emerald-800 font-bold mb-4">
             🔒 Manager Access Required
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-emerald-700 mb-6 leading-relaxed">
             You must be logged in as a manager to access this dashboard.
           </p>
           <a
             href="/auth/login"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+            className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-emerald-200/50"
           >
             Log In as Manager
           </a>
@@ -371,7 +371,7 @@ export default function ManagerDashboard() {
               </button>
               <a
                 href="/auth/logout"
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-emerald-200/50"
               >
                 🚪 Logout
               </a>
@@ -829,11 +829,11 @@ export default function ManagerDashboard() {
             {settingsMessage && (
               <div className={`p-4 rounded-lg border ${
                 settingsMessage.type === 'success'
-                  ? 'bg-green-50 border-green-200 text-green-800'
-                  : 'bg-red-50 border-red-200 text-red-800'
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                  : 'bg-orange-50 border-orange-200 text-orange-800'
               }`}>
                 <p className="font-medium">
-                  {settingsMessage.type === 'success' ? '✅' : '❌'} {settingsMessage.text}
+                  {settingsMessage.type === 'success' ? '✅' : '⚠️'} {settingsMessage.text}
                 </p>
               </div>
             )}
