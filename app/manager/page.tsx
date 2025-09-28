@@ -274,7 +274,7 @@ export default function ManagerDashboard() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading Manager Dashboard...</p>
           <p className="text-sm text-gray-500 mt-2">Verifying your account permissions</p>
         </div>
@@ -287,7 +287,7 @@ export default function ManagerDashboard() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading Dashboard Data...</p>
           <p className="text-sm text-gray-500 mt-2">Fetching analytics and staff information</p>
         </div>
@@ -365,7 +365,7 @@ export default function ManagerDashboard() {
             <div className="flex space-x-4">
               <button
                 onClick={loadAllData}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-emerald-200/50"
               >
                 🔄 Refresh Data
               </button>
@@ -403,13 +403,13 @@ export default function ManagerDashboard() {
                 onClick={() => setActiveTab(tab.key as any)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.key
-                    ? "border-blue-500 text-blue-600"
+                    ? "border-emerald-500 text-emerald-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
                 {tab.label}
                 {tab.count !== null && (
-                  <span className="ml-2 bg-gray-100 text-gray-900 py-0.5 px-2 rounded-full text-xs">
+                  <span className="ml-2 bg-emerald-100 text-emerald-900 py-0.5 px-2 rounded-full text-xs">
                     {tab.count}
                   </span>
                 )}
@@ -435,7 +435,7 @@ export default function ManagerDashboard() {
                     <h3 className="text-lg font-medium text-gray-900">
                       Active Today
                     </h3>
-                    <p className="text-3xl font-bold text-blue-600">
+                    <p className="text-3xl font-bold text-emerald-600">
                       {analytics.activeToday}
                     </p>
                   </div>
@@ -451,7 +451,7 @@ export default function ManagerDashboard() {
                     <h3 className="text-lg font-medium text-gray-900">
                       Avg Hours/Day
                     </h3>
-                    <p className="text-3xl font-bold text-green-600">
+                    <p className="text-3xl font-bold text-emerald-600">
                       {analytics.avgHoursPerDay}h
                     </p>
                   </div>
@@ -467,7 +467,7 @@ export default function ManagerDashboard() {
                     <h3 className="text-lg font-medium text-gray-900">
                       Shifts This Week
                     </h3>
-                    <p className="text-3xl font-bold text-purple-600">
+                    <p className="text-3xl font-bold text-emerald-600">
                       {analytics.totalShiftsLastWeek}
                     </p>
                   </div>
@@ -483,7 +483,7 @@ export default function ManagerDashboard() {
                     <h3 className="text-lg font-medium text-gray-900">
                       Daily Avg
                     </h3>
-                    <p className="text-3xl font-bold text-orange-600">
+                    <p className="text-3xl font-bold text-emerald-600">
                       {Math.round(analytics.totalShiftsLastWeek / 7)}
                     </p>
                   </div>
@@ -528,7 +528,7 @@ export default function ManagerDashboard() {
                       }}
                       labelStyle={{ color: "#000000", fontWeight: "bold" }}
                     />
-                    <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="count" fill="#10b981" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -572,9 +572,9 @@ export default function ManagerDashboard() {
                     <Line
                       type="monotone"
                       dataKey="count"
-                      stroke="#10b981"
+                      stroke="#059669"
                       strokeWidth={3}
-                      dot={{ fill: "#10b981", strokeWidth: 2, r: 6 }}
+                      dot={{ fill: "#059669", strokeWidth: 2, r: 6 }}
                       activeDot={{ r: 8 }}
                     />
                   </LineChart>
@@ -585,34 +585,24 @@ export default function ManagerDashboard() {
             {/* Organization Distribution */}
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                🏥 Shifts by Organization (Last 7 Days)
+                🏥 Your Organization Shifts (Last 7 Days)
               </h3>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={[
-                        { name: "City General Hospital", value: Math.floor(analytics.totalShiftsLastWeek * 0.4), fill: "#3b82f6" },
-                        { name: "Downtown Clinic", value: Math.floor(analytics.totalShiftsLastWeek * 0.25), fill: "#10b981" },
-                        { name: "Metro Medical Center", value: Math.floor(analytics.totalShiftsLastWeek * 0.2), fill: "#f59e0b" },
-                        { name: "Riverside Health Clinic", value: Math.floor(analytics.totalShiftsLastWeek * 0.15), fill: "#ef4444" },
+                        { name: "City General Hospital", value: analytics.totalShiftsLastWeek, fill: "#059669" },
                       ]}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                       outerRadius={80}
-                      fill="#8884d8"
+                      fill="#10b981"
                       dataKey="value"
                     >
-                      {[
-                        "#3b82f6",
-                        "#10b981",
-                        "#f59e0b",
-                        "#ef4444",
-                      ].map((color, index) => (
-                        <Cell key={`cell-${index}`} fill={color} />
-                      ))}
+                      <Cell key="cell-0" fill="#059669" />
                     </Pie>
                     <Tooltip
                       contentStyle={{
@@ -729,7 +719,7 @@ export default function ManagerDashboard() {
                             {clockInTime.toLocaleString()}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
                               {Math.round(durationHours * 100) / 100}h
                             </span>
                           </td>
@@ -805,7 +795,7 @@ export default function ManagerDashboard() {
                           {new Date(shift.clock_out_time).toLocaleString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
                             {calculateShiftDuration(
                               shift.clock_in_time,
                               shift.clock_out_time
@@ -843,11 +833,13 @@ export default function ManagerDashboard() {
                 ⚙️ Organization Settings
               </h3>
               <p className="text-gray-600 mb-6">
-                Configure location perimeter settings for each organization. These settings control the geofencing rules for clock-in/clock-out operations.
+                Configure location perimeter settings for your organization. These settings control the geofencing rules for clock-in/clock-out operations.
               </p>
 
               <div className="space-y-6">
-                {organizationSettings.map((org) => (
+                {organizationSettings
+                  .filter((org) => org.id === 'org1') // Only show City General Hospital
+                  .map((org) => (
                   <div key={org.id} className="border border-gray-200 rounded-lg p-6">
                     <h4 className="text-lg font-medium text-gray-900 mb-4">
                       {org.name}
@@ -873,7 +865,7 @@ export default function ManagerDashboard() {
                             step="0.000001"
                             defaultValue={org.latitude || ''}
                             required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 placeholder-gray-500"
                             placeholder="e.g., 12.9716"
                           />
                         </div>
@@ -888,7 +880,7 @@ export default function ManagerDashboard() {
                             step="0.000001"
                             defaultValue={org.longitude || ''}
                             required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 placeholder-gray-500"
                             placeholder="e.g., 77.5946"
                           />
                         </div>
@@ -904,7 +896,7 @@ export default function ManagerDashboard() {
                             max="5000"
                             defaultValue={org.radius || ''}
                             required
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 placeholder-gray-500"
                             placeholder="e.g., 200"
                           />
                         </div>
@@ -918,7 +910,7 @@ export default function ManagerDashboard() {
                         <button
                           type="submit"
                           disabled={settingsLoading}
-                          className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors"
+                          className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-200/50"
                         >
                           {settingsLoading ? 'Updating...' : 'Update Settings'}
                         </button>
@@ -935,7 +927,7 @@ export default function ManagerDashboard() {
               </h3>
               <div className="space-y-3 text-sm text-gray-600">
                 <div className="flex items-start">
-                  <span className="text-blue-500 mr-2">📍</span>
+                  <span className="text-emerald-500 mr-2">📍</span>
                   <div>
                     <p className="font-medium text-gray-900">Location Validation</p>
                     <p>Staff must be within the specified radius of their organization's coordinates to clock in or out.</p>
@@ -943,7 +935,7 @@ export default function ManagerDashboard() {
                 </div>
 
                 <div className="flex items-start">
-                  <span className="text-green-500 mr-2">🎯</span>
+                  <span className="text-emerald-500 mr-2">🎯</span>
                   <div>
                     <p className="font-medium text-gray-900">GPS Accuracy</p>
                     <p>Coordinates are validated using the Haversine formula for precise distance calculations.</p>
@@ -954,7 +946,7 @@ export default function ManagerDashboard() {
                   <span className="text-orange-500 mr-2">⚠️</span>
                   <div>
                     <p className="font-medium text-gray-900">Important Notes</p>
-                    <p>Changes to location settings will immediately affect all clock-in/clock-out operations for that organization.</p>
+                    <p>Changes to location settings will immediately affect all clock-in/clock-out operations for your organization.</p>
                   </div>
                 </div>
               </div>
