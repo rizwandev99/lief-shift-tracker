@@ -15,9 +15,6 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
 } from "recharts";
 import {
   getActiveStaffAction,
@@ -562,39 +559,29 @@ export default function ManagerDashboard() {
               </div>
             </div>
 
-            {/* Organization Distribution */}
+            {/* Organization Overview */}
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                🏥 Your Organization Shifts (Last 7 Days)
+                🏥 Organization Overview
               </h3>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={[
-                        { name: "City General Hospital", value: analytics.totalShiftsLastWeek, fill: "#059669" },
-                      ]}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#10b981"
-                      dataKey="value"
-                    >
-                      <Cell key="cell-0" fill="#059669" />
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#ffffff",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "6px",
-                        color: "#000000",
-                      }}
-                      labelStyle={{ color: "#000000", fontWeight: "bold" }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+              <div className="flex items-center justify-center h-80">
+                <div className="text-center">
+                  <div className="w-32 h-32 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <span className="text-emerald-600 text-6xl">🏥</span>
+                  </div>
+                  <h4 className="text-2xl font-bold text-gray-900 mb-2">City General Hospital</h4>
+                  <p className="text-gray-600 mb-4">Healthcare Shift Management</p>
+                  <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                    <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                      <div className="text-2xl font-bold text-emerald-600">{analytics.totalShiftsLastWeek}</div>
+                      <div className="text-sm text-gray-600">Shifts This Week</div>
+                    </div>
+                    <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                      <div className="text-2xl font-bold text-emerald-600">{analytics.activeToday}</div>
+                      <div className="text-sm text-gray-600">Active Today</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
