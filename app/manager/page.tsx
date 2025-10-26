@@ -35,10 +35,6 @@ interface ActiveStaffMember {
     email: string;
     name: string | null;
   };
-  organization: {
-    id: string;
-    name: string;
-  };
 }
 
 interface StaffHistoryEntry {
@@ -49,10 +45,6 @@ interface StaffHistoryEntry {
     id: string;
     email: string;
     name: string | null;
-  };
-  organization: {
-    id: string;
-    name: string;
   };
 }
 
@@ -154,10 +146,6 @@ export default function ManagerDashboard() {
             email: s.user?.email,
             name: s.user?.name ?? null,
           },
-          organization: {
-            id: s.organization?.id,
-            name: s.organization?.name,
-          },
         }));
         setActiveStaff(mappedActive);
       }
@@ -173,10 +161,6 @@ export default function ManagerDashboard() {
             id: s.user?.id,
             email: s.user?.email,
             name: s.user?.name ?? null,
-          },
-          organization: {
-            id: s.organization?.id,
-            name: s.organization?.name,
           },
         }));
         setStaffHistory(mappedHistory);
@@ -195,10 +179,6 @@ export default function ManagerDashboard() {
               id: s.user?.id,
               email: s.user?.email,
               name: s.user?.name ?? null,
-            },
-            organization: {
-              id: s.organization?.id,
-              name: s.organization?.name,
             },
           }));
 
@@ -597,7 +577,7 @@ export default function ManagerDashboard() {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
                       outerRadius={80}
                       fill="#10b981"
                       dataKey="value"
@@ -634,7 +614,7 @@ export default function ManagerDashboard() {
                         {formatUserName(shift.user)}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {shift.organization.name}
+                        City General Hospital
                       </p>
                     </div>
                     <div className="text-right">
@@ -672,9 +652,6 @@ export default function ManagerDashboard() {
                       Staff Member
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Organization
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Clock-in Time
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -686,7 +663,7 @@ export default function ManagerDashboard() {
                   {activeStaff.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={4}
+                        colSpan={3}
                         className="px-6 py-8 text-center text-gray-500"
                       >
                         No staff currently clocked in
@@ -711,9 +688,6 @@ export default function ManagerDashboard() {
                                 {staff.user.email}
                               </div>
                             </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {staff.organization.name}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {clockInTime.toLocaleString()}
@@ -749,9 +723,6 @@ export default function ManagerDashboard() {
                       Staff Member
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Organization
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Clock-in
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -766,7 +737,7 @@ export default function ManagerDashboard() {
                   {staffHistory.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={4}
                         className="px-6 py-8 text-center text-gray-500"
                       >
                         No shift history available
@@ -784,9 +755,6 @@ export default function ManagerDashboard() {
                               {shift.user.email}
                             </div>
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {shift.organization.name}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {new Date(shift.clock_in_time).toLocaleString()}
@@ -837,23 +805,20 @@ export default function ManagerDashboard() {
               </p>
 
               <div className="space-y-6">
-                {organizationSettings
-                  .filter((org) => org.id === 'org1') // Only show City General Hospital
-                  .map((org) => (
-                  <div key={org.id} className="border border-gray-200 rounded-lg p-6">
-                    <h4 className="text-lg font-medium text-gray-900 mb-4">
-                      {org.name}
-                    </h4>
+                {organizationSettings.map((org) => (
+                <div key={org.id} className="border border-gray-200 rounded-lg p-6">
+                  <h4 className="text-lg font-medium text-gray-900 mb-4">
+                    {org.name}
+                  </h4>
 
-                    <form
-                      onSubmit={async (e) => {
-                        e.preventDefault();
-                        const formData = new FormData(e.target as HTMLFormElement);
-                        formData.append('organizationId', org.id);
-                        await handleUpdateOrganizationSettings(formData);
-                      }}
-                      className="space-y-4"
-                    >
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const formData = new FormData(e.target as HTMLFormElement);
+                      await handleUpdateOrganizationSettings(formData);
+                    }}
+                    className="space-y-4"
+                  >
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">

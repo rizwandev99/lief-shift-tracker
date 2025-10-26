@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-lief-shift-tracker is a web application (usable on mobile and web) for healthcare workers to clock in and clock out of their shifts. It enables organizations (such as hospitals) to have care workers easily record and track shift start/end times with location-based validation.
+lief-shift-tracker is a web application (usable on mobile and web) for healthcare workers to clock in and clock out of their shifts at City General Hospital. It enables healthcare workers to easily record and track shift start/end times with location-based validation.
 
 **Core Features:**
 
@@ -58,7 +58,7 @@ No active issues identified at this stage.
   - Configuration: Domain, Client ID, Client Secret, Secret
   - Routes: /auth/login, /auth/logout, /auth/callback, /auth/profile
   - Environment variables: AUTH0_SECRET, APP_BASE_URL, AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET
-- **Supabase:** Primary database for shifts, users, and organizations
+- **Supabase:** Primary database for shifts and users
 - **Prisma:** Database ORM for type-safe queries
 - **Next.js:** React framework with server/client components
 - **Grommet:** UI component library for responsive design
@@ -69,7 +69,7 @@ No active issues identified at this stage.
 
 - Location perimeter validation requires GPS coordinates and radius settings
 - Clock-in/out operations include optional notes and location data
-- Manager settings need organization configuration (GPS coordinates, perimeter radius)
+- Manager settings include location perimeter configuration for City General Hospital (GPS coordinates, perimeter radius)
 - Progressive Web App (PWA) features planned for bonus implementation
 - Automatic location detection notifications for bonus features
 - Mobile-first responsive design required
@@ -124,7 +124,7 @@ No active issues identified at this stage.
 
 **Technical Tasks:**
 - Set up GraphQL API (if needed beyond current setup)
-- Enhance database schema for location data and notes
+- Database schema optimized for single organization with location data and notes
 - Add comprehensive error handling for geolocation failures
 - Implement real-time updates for active staff
 - Add data export functionality for reports

@@ -61,7 +61,7 @@ export default async function HomePage() {
               <span className="block text-emerald-600">Tracking Made Simple</span>
             </h1>
             <p className="text-xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Streamline your healthcare workforce management with our intuitive shift tracking system.
+              Streamline healthcare workforce management at City General Hospital with our intuitive shift tracking system.
               Ensure compliance, improve efficiency, and maintain accurate records with location-based verification.
             </p>
 
@@ -165,8 +165,8 @@ export default async function HomePage() {
           {/* Stats Section */}
           <div className="mt-20 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-3xl shadow-lg p-10 border border-emerald-100">
             <div className="text-center mb-10">
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">Trusted by Healthcare Organizations</h2>
-              <p className="text-gray-600 text-lg">Join thousands of healthcare professionals using our platform</p>
+              <h2 className="text-3xl font-bold text-gray-800 mb-4">Trusted by City General Hospital</h2>
+              <p className="text-gray-600 text-lg">Join healthcare professionals using our platform</p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -179,8 +179,8 @@ export default async function HomePage() {
                 <div className="text-gray-700 font-medium">Active Staff</div>
               </div>
               <div className="text-center group">
-                <div className="text-4xl font-bold text-emerald-600 mb-3 group-hover:scale-110 transition-transform duration-300">5</div>
-                <div className="text-gray-700 font-medium">Organizations</div>
+                <div className="text-4xl font-bold text-emerald-600 mb-3 group-hover:scale-110 transition-transform duration-300">1</div>
+                <div className="text-gray-700 font-medium">Organization</div>
               </div>
               <div className="text-center group">
                 <div className="text-4xl font-bold text-emerald-600 mb-3 group-hover:scale-110 transition-transform duration-300">99.9%</div>

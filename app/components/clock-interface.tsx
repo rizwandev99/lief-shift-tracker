@@ -16,20 +16,12 @@ import {
 interface ActiveShift {
   id: string;
   clock_in_time: Date;
-  organization: {
-    id: string;
-    name: string;
-  };
 }
 
 interface ShiftHistory {
   id: string;
   clock_in_time: Date;
   clock_out_time: Date | null;
-  organization: {
-    id: string;
-    name: string;
-  };
   notes?: string | null;
 }
 
@@ -116,7 +108,6 @@ export default function ClockInterface() {
 
     try {
       const formData = new FormData();
-      formData.append("organizationId", "org1"); // Using seeded organization
       formData.append("latitude", location.latitude.toString());
       formData.append("longitude", location.longitude.toString());
       formData.append("notes", notes);
@@ -296,7 +287,7 @@ export default function ClockInterface() {
               🕐 Current Shift
             </h3>
             <div className="text-emerald-700">
-              <p className="font-medium">{activeShift.organization.name}</p>
+              <p className="font-medium">City General Hospital</p>
               <p className="text-sm">
                 Started: {new Date(activeShift.clock_in_time).toLocaleString()}
               </p>
@@ -407,7 +398,7 @@ export default function ClockInterface() {
                   {/* Organization and Date */}
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium text-gray-800 text-sm">
-                      {shift.organization.name}
+                      City General Hospital
                     </h4>
                     <span className="text-xs text-emerald-600 font-medium">
                       {new Date(shift.clock_in_time).toLocaleDateString()}

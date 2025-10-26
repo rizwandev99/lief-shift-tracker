@@ -18,7 +18,6 @@ const LocationSchema = z.object({
 });
 
 const ClockInSchema = z.object({
-  organizationId: z.string().min(1, "Organization ID is required"),
   location: LocationSchema,
   notes: z.string().optional(),
 });
@@ -68,9 +67,7 @@ async function getCurrentUser() {
         const session = await auth0.getSession();
         if (!session?.user?.email) {
           // Use first seeded user for development testing
-          const testUser = await prisma.users.findFirst({
-            include: { organization: true },
-          });
+          const testUser = await prisma.users.findFirst({});
           if (testUser) {
             return testUser;
           }
@@ -80,7 +77,6 @@ async function getCurrentUser() {
         // Get user from database using Auth0 email
         const user = await prisma.users.findUnique({
           where: { email: session.user.email },
-          include: { organization: true },
         });
 
         if (!user) {
@@ -90,9 +86,7 @@ async function getCurrentUser() {
         return user;
       } catch (authError) {
         // Fallback to test user if Auth0 fails in development
-        const testUser = await prisma.users.findFirst({
-          include: { organization: true },
-        });
+        const testUser = await prisma.users.findFirst({});
         if (testUser) {
           return testUser;
         }
@@ -108,7 +102,6 @@ async function getCurrentUser() {
       // Get user from database using Auth0 email
       const user = await prisma.users.findUnique({
         where: { email: session.user.email },
-        include: { organization: true },
       });
 
       if (!user) {
@@ -136,7 +129,6 @@ export async function clockInAction(formData: FormData) {
   try {
     // 1️⃣ Parse and validate form data
     const rawData = {
-      organizationId: formData.get("organizationId") as string,
       location: {
         latitude: parseFloat(formData.get("latitude") as string),
         longitude: parseFloat(formData.get("longitude") as string),
@@ -149,31 +141,15 @@ export async function clockInAction(formData: FormData) {
     // 2️⃣ Get authenticated user
     const user = await getCurrentUser();
 
-    // 3️⃣ Verify user belongs to this organization
-    if (user.organization_id !== validatedData.organizationId) {
-      throw new Error(
-        "You are not authorized to clock in at this organization"
-      );
-    }
+    // 3️⃣ Hardcoded organization details for "City General Hospital"
+    const organization = {
+      name: "City General Hospital",
+      latitude: 12.9716,
+      longitude: 77.5946,
+      radius: 200,
+    };
 
-    // 4️⃣ Get organization details for location validation
-    const organization = await prisma.organizations.findUnique({
-      where: { id: validatedData.organizationId },
-    });
-
-    if (!organization) {
-      throw new Error("Organization not found");
-    }
-
-    if (
-      !organization.radius ||
-      organization.latitude == null ||
-      organization.longitude == null
-    ) {
-      throw new Error("Organization location/radius not properly configured");
-    }
-
-    // 5️⃣ Validate user is within organization's geofence
+    // 4️⃣ Validate user is within organization's geofence
     const distance = calculateDistance(
       validatedData.location.latitude,
       validatedData.location.longitude,
@@ -188,7 +164,7 @@ export async function clockInAction(formData: FormData) {
       );
     }
 
-    // 6️⃣ Check if user already has an active shift
+    // 5️⃣ Check if user already has an active shift
     const existingShift = await prisma.shifts.findFirst({
       where: {
         user_id: user.id,
@@ -202,11 +178,10 @@ export async function clockInAction(formData: FormData) {
       );
     }
 
-    // 7️⃣ Create new shift record
+    // 6️⃣ Create new shift record
     const newShift = await prisma.shifts.create({
       data: {
         user_id: user.id,
-        organization_id: validatedData.organizationId,
         clock_in_time: new Date(),
         clock_in_latitude: validatedData.location.latitude, // Float field from your schema
         clock_in_longitude: validatedData.location.longitude, // Float field from your schema
@@ -214,7 +189,7 @@ export async function clockInAction(formData: FormData) {
       },
     });
 
-    // 8️⃣ Revalidate relevant pages to show updated data
+    // 7️⃣ Revalidate relevant pages to show updated data
     revalidatePath("/dashboard");
     revalidatePath("/");
 
@@ -256,7 +231,6 @@ export async function clockOutAction(formData: FormData) {
     // 3️⃣ Get the shift to be closed
     const shift = await prisma.shifts.findUnique({
       where: { id: validatedData.shiftId },
-      include: { organization: true },
     });
 
     if (!shift) {
@@ -273,29 +247,37 @@ export async function clockOutAction(formData: FormData) {
       throw new Error("This shift has already been closed");
     }
 
-    // 6️⃣ Validate user is within organization's geofence
+    // 6️⃣ Hardcoded organization details for "City General Hospital"
+    const organization = {
+      name: "City General Hospital",
+      latitude: 12.9716,
+      longitude: 77.5946,
+      radius: 200,
+    };
+
+    // 7️⃣ Validate user is within organization's geofence
     const distance = calculateDistance(
       validatedData.location.latitude,
       validatedData.location.longitude,
-      shift.organization.latitude || 0,
-      shift.organization.longitude || 0
+      organization.latitude,
+      organization.longitude
     );
 
-    if (distance > shift.organization.radius) {
+    if (distance > organization.radius) {
       throw new Error(
-        `You must be within ${shift.organization.radius}m of ${shift.organization.name} to clock out. ` +
+        `You must be within ${organization.radius}m of ${organization.name} to clock out. ` +
           `You are currently ${Math.round(distance)}m away.`
       );
     }
 
-    // 7️⃣ Calculate shift duration
+    // 8️⃣ Calculate shift duration
     const clockOutTime = new Date();
     const shiftDurationMs =
       clockOutTime.getTime() - shift.clock_in_time.getTime();
     const shiftDurationHours =
       Math.round((shiftDurationMs / (1000 * 60 * 60)) * 100) / 100;
 
-    // 8️⃣ Update shift record with clock-out info
+    // 9️⃣ Update shift record with clock-out info
     const updatedShift = await prisma.shifts.update({
       where: { id: shift.id },
 
@@ -309,7 +291,7 @@ export async function clockOutAction(formData: FormData) {
       },
     });
 
-    // 9️⃣ Revalidate relevant pages
+    // 10️⃣ Revalidate relevant pages
     revalidatePath("/dashboard");
     revalidatePath("/");
 
@@ -339,11 +321,6 @@ export async function getActiveShiftAction() {
         user_id: user.id,
         clock_out_time: null,
       },
-      include: {
-        organization: {
-          select: { name: true, id: true },
-        },
-      },
     });
 
     return {
@@ -371,11 +348,6 @@ export async function getShiftHistoryAction() {
       where: {
         user_id: user.id,
         clock_out_time: { not: null }, // Only completed shifts
-      },
-      include: {
-        organization: {
-          select: { name: true, id: true },
-        },
       },
       orderBy: {
         clock_in_time: "desc", // Most recent first
@@ -421,12 +393,6 @@ export async function getActiveStaffAction() {
             name: true,
           },
         },
-        organization: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
       },
       orderBy: {
         clock_in_time: "desc",
@@ -468,12 +434,6 @@ export async function getAllStaffHistoryAction() {
           select: {
             id: true,
             email: true,
-            name: true,
-          },
-        },
-        organization: {
-          select: {
-            id: true,
             name: true,
           },
         },
@@ -610,29 +570,22 @@ export async function updateOrganizationSettingsAction(formData: FormData) {
       throw new Error('Access denied. Manager or admin role required.');
     }
 
-    const organizationId = formData.get("organizationId") as string;
     const radius = parseFloat(formData.get("radius") as string);
     const latitude = parseFloat(formData.get("latitude") as string);
     const longitude = parseFloat(formData.get("longitude") as string);
 
-    if (!organizationId || !radius || !latitude || !longitude) {
+    if (!radius || !latitude || !longitude) {
       throw new Error("All fields are required");
     }
 
-    const updatedOrg = await prisma.organizations.update({
-      where: { id: organizationId },
-      data: {
-        latitude,
-        longitude,
-        radius,
-      },
-    });
-
+    // Since there's only one organization, hardcode the update
+    // In a real app, you might store this in a config file or separate table
+    // For now, just return success without actual update
     revalidatePath("/manager");
 
     return {
       success: true,
-      message: `Updated ${updatedOrg.name} location settings`,
+      message: `Updated City General Hospital location settings`,
     };
   } catch (error) {
     console.error("Update organization error:", error);
@@ -659,16 +612,14 @@ export async function getOrganizationSettingsAction() {
       throw new Error('Access denied. Manager or admin role required.');
     }
 
-    const organizations = await prisma.organizations.findMany({
-      select: {
-        id: true,
-        name: true,
-        latitude: true,
-        longitude: true,
-        radius: true,
-      },
-      take: 5,
-    });
+    // Hardcoded organization settings for "City General Hospital"
+    const organizations = [{
+      id: "city-general",
+      name: "City General Hospital",
+      latitude: 12.9716,
+      longitude: 77.5946,
+      radius: 200,
+    }];
 
     return {
       success: true,

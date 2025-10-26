@@ -27,6 +27,5 @@ export default prisma;
 
 export type {
   users as User,
-  organizations as Organization,
   shifts as Shift,
 } from "@prisma/client";

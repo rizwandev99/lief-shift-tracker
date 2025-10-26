@@ -14,32 +14,6 @@ datasource db {
   directUrl = env("DIRECT_URL")      // Direct connection for migrations
 }
 
-// 🏥 ORGANIZATIONS MODEL
-// This represents hospitals, clinics, or healthcare facilities where workers clock-in
-model organizations {
-  // 📋 PRIMARY KEY: Unique identifier for each organization
-  id          String   @id @default(cuid())  // cuid() creates unique, URL-safe IDs
-  
-  // 🏢 ORGANIZATION DETAILS
-  name        String   // Example: "City General Hospital", "Downtown Clinic"
-  address     String?  // Physical address (? means optional)
-  
-  // 📍 LOCATION DATA: Used for GPS proximity validation
-  latitude    Float?   // GPS coordinate for hospital location
-  longitude   Float?   // GPS coordinate for hospital location  
-  radius      Int      @default(100) // Allowed check-in radius in meters (default: 100m)
-  
-  // ⏰ TIMESTAMPS: Automatically managed by Prisma
-  created_at  DateTime @default(now())  // When organization was added
-  updated_at  DateTime @updatedAt       // Last time organization was modified
-
-  // 🔗 RELATIONSHIPS: How this table connects to others
-  users  users[]  // One organization can have many users (workers)
-  shifts shifts[] // One organization can have many shifts recorded
-
-  // 🎯 TABLE NAME MAPPING: Keep consistent with existing Supabase setup
-  @@map("organizations") // Maps to existing "organizations" table in database
-}
 
 // 👥 USERS MODEL  
 // This represents healthcare workers (nurses, doctors, technicians, managers, etc.)
@@ -52,9 +26,6 @@ model users {
   name            String?                       // Full name (optional)
   role            String   @default("worker")   // "worker", "manager", "admin"
   
-  // 🏢 WORKPLACE CONNECTION
-  organization_id String                        // Which hospital/facility they work at
-  
   // 📊 ACCOUNT STATUS
   active          Boolean  @default(true)       // Whether account is active
   
@@ -63,8 +34,7 @@ model users {
   updated_at      DateTime @updatedAt           // Last profile update
 
   // 🔗 RELATIONSHIPS: How this connects to other tables
-  // Each user belongs to one organization, can have many shifts
-  organization organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+  // Each user can have many shifts
   shifts       shifts[]     // All shifts this user has worked
 
   // 🎯 TABLE NAME MAPPING
@@ -79,7 +49,6 @@ model shifts {
   
   // 👤 WHO & WHERE: Links to user and their workplace
   user_id              String    // Which healthcare worker
-  organization_id      String    // Which facility (hospital/clinic)
   
   // 🟢 CLOCK-IN DATA: When worker starts their shift
   clock_in_time        DateTime  // Exact timestamp when clocked in
@@ -99,16 +68,14 @@ model shifts {
   created_at          DateTime  @default(now()) // When shift record was created
   updated_at          DateTime  @updatedAt      // Last time shift was updated
 
-  // 🔗 RELATIONSHIPS: How shifts connect to users and organizations
+  // 🔗 RELATIONSHIPS: How shifts connect to users
   user         users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  organization organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade)
 
   // 🎯 TABLE NAME MAPPING
   @@map("shifts")
   
   // 📈 DATABASE INDEXES: Make queries faster (2025 best practice)
   @@index([user_id])                    // Fast lookup of user's shifts
-  @@index([organization_id])            // Fast lookup of organization's shifts  
   @@index([clock_in_time])              // Fast lookup by date/time
   @@index([user_id, clock_out_time])    // Fast lookup of active shifts
 }
