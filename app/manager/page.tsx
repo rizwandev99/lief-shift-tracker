@@ -15,6 +15,9 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
+  RadialBarChart,
+  RadialBar,
+  Legend,
 } from "recharts";
 import {
   getActiveStaffAction,
@@ -559,29 +562,64 @@ export default function ManagerDashboard() {
               </div>
             </div>
 
-            {/* Organization Overview */}
+            {/* Organization Performance */}
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                🏥 Organization Overview
+                🏥 Organization Performance
               </h3>
-              <div className="flex items-center justify-center h-80">
-                <div className="text-center">
-                  <div className="w-32 h-32 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                    <span className="text-emerald-600 text-6xl">🏥</span>
-                  </div>
-                  <h4 className="text-2xl font-bold text-gray-900 mb-2">City General Hospital</h4>
-                  <p className="text-gray-600 mb-4">Healthcare Shift Management</p>
-                  <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-                    <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
-                      <div className="text-2xl font-bold text-emerald-600">{analytics.totalShiftsLastWeek}</div>
-                      <div className="text-sm text-gray-600">Shifts This Week</div>
-                    </div>
-                    <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
-                      <div className="text-2xl font-bold text-emerald-600">{analytics.activeToday}</div>
-                      <div className="text-sm text-gray-600">Active Today</div>
-                    </div>
-                  </div>
-                </div>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadialBarChart
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="20%"
+                    outerRadius="90%"
+                    data={[
+                      {
+                        name: "Active Staff",
+                        value: Math.min((analytics.activeToday / 12) * 100, 100),
+                        fill: "#10b981"
+                      },
+                      {
+                        name: "Weekly Activity",
+                        value: Math.min((analytics.totalShiftsLastWeek / 50) * 100, 100),
+                        fill: "#059669"
+                      },
+                      {
+                        name: "Efficiency",
+                        value: 95,
+                        fill: "#047857"
+                      }
+                    ]}
+                  >
+                    <RadialBar
+                      dataKey="value"
+                      cornerRadius={10}
+                      fill="#10b981"
+                    />
+                    <Legend
+                      iconSize={18}
+                      wrapperStyle={{
+                        paddingTop: "20px",
+                        fontSize: "14px"
+                      }}
+                    />
+                    <Tooltip
+                      formatter={(value: number) => [`${value.toFixed(1)}%`, ""]}
+                      contentStyle={{
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "6px",
+                        color: "#000000",
+                      }}
+                      labelStyle={{ color: "#000000", fontWeight: "bold" }}
+                    />
+                  </RadialBarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-4 text-center">
+                <h4 className="text-lg font-semibold text-gray-900">City General Hospital</h4>
+                <p className="text-sm text-gray-600">Performance metrics and activity levels</p>
               </div>
             </div>
 
