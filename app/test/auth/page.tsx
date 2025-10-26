@@ -12,12 +12,25 @@ export default async function TestAuthPage() {
   const user = session?.user;
 
   // Get base URL from environment variable, fallback to localhost
-  const baseUrl =
-    process.env.AUTH0_BASE_URL ||
-    process.env.APP_BASE_URL ||
-    "http://localhost:3000";
+  const baseUrl = process.env.APP_BASE_URL || "http://localhost:3001";
   const returnPath = "/test/auth";
   const fullReturnUrl = `${baseUrl}${returnPath}`;
+
+  console.log('Auth test page - Session:', !!session, 'User:', !!user);
+  console.log('Base URL:', baseUrl, 'Return URL:', fullReturnUrl);
+  console.log('APP_BASE_URL env:', process.env.APP_BASE_URL);
+  console.log('AUTH0_BASE_URL env:', process.env.AUTH0_BASE_URL);
+
+  // Force dynamic rendering to avoid caching issues
+  const timestamp = Date.now();
+
+  // If no session, redirect to login immediately for testing
+  if (!session) {
+    console.log('No session found, redirecting to login...');
+    // Don't redirect automatically, let user click the button
+  } else {
+    console.log('Session found! User authenticated.');
+  }
 
   return (
     <Box
@@ -102,6 +115,18 @@ export default async function TestAuthPage() {
                 size="large"
               />
             </a>
+
+            {/* Debug Info */}
+            <Box background="light-2" pad="small" round="small" margin={{ top: "medium" }}>
+              <Text size="small" color="dark-3">
+                <strong>Debug Info:</strong><br/>
+                Base URL: {baseUrl}<br/>
+                Return URL: {fullReturnUrl}<br/>
+                Session: {session ? 'Yes' : 'No'}<br/>
+                User: {user ? 'Yes' : 'No'}<br/>
+                Timestamp: {timestamp}
+              </Text>
+            </Box>
           </Box>
         )}
 

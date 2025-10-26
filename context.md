@@ -54,6 +54,10 @@ No active issues identified at this stage.
 ## Dependencies & Integrations
 
 - **Auth0:** User authentication with Google/email login options
+  - SDK: @auth0/nextjs-auth0
+  - Configuration: Domain, Client ID, Client Secret, Secret
+  - Routes: /auth/login, /auth/logout, /auth/callback, /auth/profile
+  - Environment variables: AUTH0_SECRET, APP_BASE_URL, AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET
 - **Supabase:** Primary database for shifts, users, and organizations
 - **Prisma:** Database ORM for type-safe queries
 - **Next.js:** React framework with server/client components
@@ -70,6 +74,35 @@ No active issues identified at this stage.
 - Automatic location detection notifications for bonus features
 - Mobile-first responsive design required
 - Authentication guards needed for role-based access (manager vs care worker)
+
+## Auth0 Integration Reference
+
+**SDK Setup:**
+- Install: `npm install @auth0/nextjs-auth0`
+- Client initialization in `lib/auth0.js` with authorization parameters
+- Middleware configuration for route protection
+
+**Environment Variables:**
+- AUTH0_SECRET: Generated using `openssl rand -hex 32`
+- APP_BASE_URL: Application base URL (e.g., http://localhost:3000)
+- AUTH0_DOMAIN: Auth0 tenant domain
+- AUTH0_CLIENT_ID: Application client ID
+- AUTH0_CLIENT_SECRET: Application client secret
+- AUTH0_AUDIENCE: API identifier (optional)
+- AUTH0_SCOPE: Permission scopes (optional)
+
+**Auto-configured Routes:**
+- /auth/login: Login endpoint
+- /auth/logout: Logout endpoint
+- /auth/callback: Authentication callback
+- /auth/profile: User profile endpoint
+- /auth/access-token: Access token endpoint
+
+**Usage Patterns:**
+- Server components: Use `auth0.getSession()` for user data
+- Client components: Use `useUser()` hook from @auth0/nextjs-auth0
+- Login: Link to `/auth/login` with optional returnTo parameter
+- Logout: Link to `/auth/logout` with optional returnTo parameter
 
 ## Next Steps
 

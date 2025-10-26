@@ -62,22 +62,61 @@ function calculateDistance(
  */
 async function getCurrentUser() {
   try {
-    const session = await auth0.getSession();
-    if (!session?.user?.email) {
-      throw new Error("User not authenticated");
+    // In development mode, if no session, use the first seeded user for testing
+    if (process.env.NODE_ENV === "development") {
+      try {
+        const session = await auth0.getSession();
+        if (!session?.user?.email) {
+          // Use first seeded user for development testing
+          const testUser = await prisma.users.findFirst({
+            include: { organization: true },
+          });
+          if (testUser) {
+            return testUser;
+          }
+          throw new Error("No users found in database");
+        }
+
+        // Get user from database using Auth0 email
+        const user = await prisma.users.findUnique({
+          where: { email: session.user.email },
+          include: { organization: true },
+        });
+
+        if (!user) {
+          throw new Error("User not found in database");
+        }
+
+        return user;
+      } catch (authError) {
+        // Fallback to test user if Auth0 fails in development
+        const testUser = await prisma.users.findFirst({
+          include: { organization: true },
+        });
+        if (testUser) {
+          return testUser;
+        }
+        throw authError;
+      }
+    } else {
+      // Production mode - require proper Auth0 authentication
+      const session = await auth0.getSession();
+      if (!session?.user?.email) {
+        throw new Error("User not authenticated");
+      }
+
+      // Get user from database using Auth0 email
+      const user = await prisma.users.findUnique({
+        where: { email: session.user.email },
+        include: { organization: true },
+      });
+
+      if (!user) {
+        throw new Error("User not found in database");
+      }
+
+      return user;
     }
-
-    // Get user from database using Auth0 email
-    const user = await prisma.users.findUnique({
-      where: { email: session.user.email },
-      include: { organization: true },
-    });
-
-    if (!user) {
-      throw new Error("User not found in database");
-    }
-
-    return user;
   } catch (error) {
     throw new Error(
       `Authentication failed: ${
@@ -365,8 +404,10 @@ export async function getActiveStaffAction() {
   try {
     const user = await getCurrentUser();
 
-    // For now, any authenticated user can be a manager
-    // In production, you'd check user role here
+    // Check if user has manager or admin role
+    if (user.role !== 'manager' && user.role !== 'admin') {
+      throw new Error('Access denied. Manager or admin role required.');
+    }
 
     const activeStaff = await prisma.shifts.findMany({
       where: {
@@ -413,6 +454,11 @@ export async function getAllStaffHistoryAction() {
   try {
     const user = await getCurrentUser();
 
+    // Check if user has manager or admin role
+    if (user.role !== 'manager' && user.role !== 'admin') {
+      throw new Error('Access denied. Manager or admin role required.');
+    }
+
     const staffHistory = await prisma.shifts.findMany({
       where: {
         clock_out_time: { not: null }, // Completed shifts only
@@ -458,6 +504,11 @@ export async function getAllStaffHistoryAction() {
 export async function getAnalyticsAction() {
   try {
     const user = await getCurrentUser();
+
+    // Check if user has manager or admin role
+    if (user.role !== 'manager' && user.role !== 'admin') {
+      throw new Error('Access denied. Manager or admin role required.');
+    }
 
     // Get data for last 7 days
     const sevenDaysAgo = new Date();
@@ -554,6 +605,11 @@ export async function updateOrganizationSettingsAction(formData: FormData) {
   try {
     const user = await getCurrentUser();
 
+    // Check if user has manager or admin role
+    if (user.role !== 'manager' && user.role !== 'admin') {
+      throw new Error('Access denied. Manager or admin role required.');
+    }
+
     const organizationId = formData.get("organizationId") as string;
     const radius = parseFloat(formData.get("radius") as string);
     const latitude = parseFloat(formData.get("latitude") as string);
@@ -590,13 +646,18 @@ export async function updateOrganizationSettingsAction(formData: FormData) {
   }
 }
 
-/* 
-Manager actions - Get organizations details to see for updationg settings
+/*
+Manager actions - Get organizations details to see for updating settings
 */
 
 export async function getOrganizationSettingsAction() {
   try {
     const user = await getCurrentUser();
+
+    // Check if user has manager or admin role
+    if (user.role !== 'manager' && user.role !== 'admin') {
+      throw new Error('Access denied. Manager or admin role required.');
+    }
 
     const organizations = await prisma.organizations.findMany({
       select: {

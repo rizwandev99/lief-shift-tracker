@@ -7,8 +7,8 @@
   - [Rule Modification Policy](#rule-modification-policy)
   - [Categorization Requirement](#categorization-requirement)
   - [Rule Organization Guidelines](#rule-organization-guidelines)
-- [Git Rules](#git-rules)
   - [Synchronization After Commit](#synchronization-after-commit)
+- [Git Rules](#git-rules)
 - [Context Management](#context-management)
   - [Auto-Context Creation and Maintenance](#auto-context-creation-and-maintenance)
   - [Initial Setup](#initial-setup)
@@ -16,10 +16,12 @@
   - [Update Triggers](#update-triggers)
 - [File and Asset Management](#file-and-asset-management)
   - [File Verification](#file-verification)
+  - [Environment File Management](#environment-file-management)
 
 ## Rule Organization
 
 ### Table of Contents Maintenance
+
 ### Rule Organization Guidelines
 
 When organizing rules, first review all existing categories. If a relevant category exists (e.g., "Git Rules" for Git-related commands, operations, or tools like log, add, commit, push, status, or content insertion via tools), add the new rule directly inside that category in a hierarchical manner. If no suitable category is found, create a new category in agents.md file and place the rule there, ensuring the structure remains hierarchical (e.g., top-level categories like "Git Rules" or "General Rules", with subcategories as needed). Always prioritize existing categories before creating new ones, and maintain logical hierarchy based on the context of previous interactions, such as Git workflows, tool usages, or content modifications.
@@ -28,7 +30,8 @@ At the beginning of each interaction, generate and insert a table of contents at
 
 ### Synchronization After Commit
 
-After committing changes (such as adding AGENTS.md and context.md, updating shift actions and components, and deleting custom rules), synchronize from both sides by pulling from the remote repository and then pushing the committed changes to ensure both local and remote are up-to-date. If merge conflicts arise during the pull operation, resolve them by editing the conflicting files, then add and commit the resolutions before pushing.
+After committing changes (such as adding AGENTS.md and CONTEXT.md, updating shift actions and components, and deleting custom rules), synchronize from both sides by pulling from the remote repository and then pushing the committed changes to ensure both local and remote are up-to-date. If merge conflicts arise during the pull operation, resolve them by editing the conflicting files, then add and commit the resolutions before pushing.
+
 - [Section Name](#section-name)
 - [Subsection Name](#subsection-name)
 
@@ -50,11 +53,11 @@ Whenever I tell you to git commit, commit both git_author_date and git_committer
 
 ## Auto-Context Creation and Maintenance
 
-AI agents **MUST** create and maintain a `context.md` file at the project root to prevent hallucination and context loss. This file serves as the project's memory system.
+AI agents **MUST** create and maintain a `CONTEXT.md` file at the project root to prevent hallucination and context loss. This file serves as the project's memory system.
 
 ### Initial Setup
 
-- Check if `context.md` exists at the project root.
+- Check if `CONTEXT.md` exists at the project root.
 - If not found, create it immediately with the following structure:
 
 ```markdown
@@ -91,15 +94,15 @@ AI agents **MUST** create and maintain a `context.md` file at the project root t
 
 ### Maintenance Requirements
 
-- Update `context.md` after every significant code change or decision.
+- Update `CONTEXT.md` after every significant code change or decision.
 - Add new sections as the project evolves.
 - Remove outdated information but **keep decision history**.
 - Always reference this file before making suggestions or changes.
-- When answering questions, first check `context.md` for relevant information.
+- When answering questions, first check `CONTEXT.md` for relevant information.
 
 ### Update Triggers
 
-Update `context.md` when:
+Update `CONTEXT.md` when:
 
 - New features are added.
 - Architecture changes are made.
@@ -115,5 +118,12 @@ You have to ensure **consistent, informed development** without losing project k
 ### File Verification
 
 Always verify file names, extensions, and paths in the project directory before referencing them in code to prevent broken links, missing assets, or runtime errors. Use directory listing tools to confirm exact filenames before implementing asset references.
+
+### Environment File Management
+
+- Check if `.gitignore` file exists at the project root. If not, create one and add `.env` and `.env.local` to it, but not `.env.example`. Ensure `.gitignore` only ignores `.env` and `.env.local`, not `.env.example`, so that `.env.example` can be committed to the repository.
+- Check if `.env.example` file exists at the project root. If not, create it as a template listing all environment variables needed for the project to run. It should contain placeholder values and be committed to the repository. New developers can copy `.env.example` to `.env.local` and fill in their own credentials.
+- Always synchronize environment variable names to `.env.example` with dummy data whenever new environment variables are added or existing ones are changed in the project. Check against all environment files (.env, .env.local, etc.) to ensure completeness.
+- Before synchronizing .env.example, always read and verify the exact content of all environment files (.env, .env.local, etc.) to ensure only existing variables are included and no variables are missed or incorrectly added.
 
 ---

@@ -233,9 +233,17 @@ export default function ClockInterface() {
       <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            🏥 Healthcare Shift Tracker
-          </h1>
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-bold text-gray-800">
+              🏥 Healthcare Shift Tracker
+            </h1>
+            <a
+              href="/api/auth/logout"
+              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm transition-colors"
+            >
+              🚪 Logout
+            </a>
+          </div>
           <p className="text-gray-600">Welcome, {user.name || user.email}</p>
         </div>
 
