@@ -15,9 +15,8 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  RadialBarChart,
-  RadialBar,
   Legend,
+  Cell,
 } from "recharts";
 import {
   getActiveStaffAction,
@@ -569,43 +568,38 @@ export default function ManagerDashboard() {
               </h3>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadialBarChart
-                    cx="50%"
-                    cy="50%"
-                    innerRadius="20%"
-                    outerRadius="90%"
+                  <BarChart
+                    layout="horizontal"
                     data={[
                       {
-                        name: "Active Staff",
+                        metric: "Active Staff",
                         value: Math.min((analytics.activeToday / 12) * 100, 100),
-                        fill: "#10b981"
+                        target: 100,
+                        color: "#10b981"
                       },
                       {
-                        name: "Weekly Activity",
+                        metric: "Weekly Activity",
                         value: Math.min((analytics.totalShiftsLastWeek / 50) * 100, 100),
-                        fill: "#059669"
+                        target: 100,
+                        color: "#059669"
                       },
                       {
-                        name: "Efficiency",
+                        metric: "Efficiency",
                         value: 95,
-                        fill: "#047857"
+                        target: 100,
+                        color: "#047857"
                       }
                     ]}
+                    margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
                   >
-                    <RadialBar
-                      dataKey="value"
-                      cornerRadius={10}
-                      fill="#10b981"
-                    />
-                    <Legend
-                      iconSize={18}
-                      wrapperStyle={{
-                        paddingTop: "20px",
-                        fontSize: "14px"
-                      }}
-                    />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" domain={[0, 100]} />
+                    <YAxis dataKey="metric" type="category" width={90} />
                     <Tooltip
-                      formatter={(value: number) => [`${value.toFixed(1)}%`, ""]}
+                      formatter={(value: number, name: string) => [
+                        `${value.toFixed(1)}%`,
+                        name === "value" ? "Current" : "Target"
+                      ]}
                       contentStyle={{
                         backgroundColor: "#ffffff",
                         border: "1px solid #e5e7eb",
@@ -614,7 +608,17 @@ export default function ManagerDashboard() {
                       }}
                       labelStyle={{ color: "#000000", fontWeight: "bold" }}
                     />
-                  </RadialBarChart>
+                    <Legend />
+                    <Bar dataKey="value" fill="#10b981" radius={[0, 4, 4, 0]}>
+                      {[
+                        { metric: "Active Staff", value: Math.min((analytics.activeToday / 12) * 100, 100), color: "#10b981" },
+                        { metric: "Weekly Activity", value: Math.min((analytics.totalShiftsLastWeek / 50) * 100, 100), color: "#059669" },
+                        { metric: "Efficiency", value: 95, color: "#047857" }
+                      ].map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
                 </ResponsiveContainer>
               </div>
               <div className="mt-4 text-center">
