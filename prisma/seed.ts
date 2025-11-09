@@ -101,11 +101,33 @@ async function main() {
 
   // Generate comprehensive shift data for the last 7 days
   const now = new Date();
-  const shifts = [];
+  const shifts: {
+    id: string;
+    user_id: string;
+    clock_in_time: Date;
+    clock_in_latitude: number;
+    clock_in_longitude: number;
+    clock_out_time: Date | null;
+    clock_out_latitude: number | null;
+    clock_out_longitude: number | null;
+    duration_minutes: number | null;
+    notes: string | null;
+  }[] = [];
 
   // Helper function to generate random shifts
   const generateShiftsForUser = (userId: string, daysBack: number = 7) => {
-    const userShifts = [];
+    const userShifts: {
+      id: string;
+      user_id: string;
+      clock_in_time: Date;
+      clock_in_latitude: number;
+      clock_in_longitude: number;
+      clock_out_time: Date | null;
+      clock_out_latitude: number | null;
+      clock_out_longitude: number | null;
+      duration_minutes: number | null;
+      notes: string | null;
+    }[] = [];
     const baseDate = new Date(now);
     baseDate.setDate(baseDate.getDate() - daysBack);
 
@@ -136,10 +158,21 @@ async function main() {
           clock_in_latitude: 12.9716 + (Math.random() - 0.5) * 0.01, // Slight GPS variation for City General Hospital
           clock_in_longitude: 77.5946 + (Math.random() - 0.5) * 0.01,
           clock_out_time: isActive ? null : clockOutTime,
-          clock_out_latitude: isActive ? null : 12.9716 + (Math.random() - 0.5) * 0.01,
-          clock_out_longitude: isActive ? null : 77.5946 + (Math.random() - 0.5) * 0.01,
+          clock_out_latitude: isActive
+            ? null
+            : 12.9716 + (Math.random() - 0.5) * 0.01,
+          clock_out_longitude: isActive
+            ? null
+            : 77.5946 + (Math.random() - 0.5) * 0.01,
           duration_minutes: isActive ? null : shiftDuration * 60,
-          notes: isActive ? null : ["Smooth shift", "Busy day", "Quiet evening", "Emergency response"][Math.floor(Math.random() * 4)],
+          notes: isActive
+            ? null
+            : [
+                "Smooth shift",
+                "Busy day",
+                "Quiet evening",
+                "Emergency response",
+              ][Math.floor(Math.random() * 4)],
         });
       }
     }
@@ -148,7 +181,20 @@ async function main() {
   };
 
   // Generate shifts for all users
-  const userIds = ["user1", "user2", "user3", "user4", "user5", "user6", "user7", "user8", "user9", "user10", "user11", "user12"];
+  const userIds = [
+    "user1",
+    "user2",
+    "user3",
+    "user4",
+    "user5",
+    "user6",
+    "user7",
+    "user8",
+    "user9",
+    "user10",
+    "user11",
+    "user12",
+  ];
 
   for (const userId of userIds) {
     shifts.push(...generateShiftsForUser(userId));

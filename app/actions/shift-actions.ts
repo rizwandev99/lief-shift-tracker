@@ -518,7 +518,7 @@ export async function getAnalyticsAction() {
     const avgHoursPerDay = totalHours / 7;
 
     // Daily clock-ins for last 7 days
-    const dailyClockIns = [];
+    const dailyClockIns: Array<{ date: string; count: number }> = [];
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
