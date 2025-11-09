@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 import { Box, Heading, Text, Button } from "grommet";
 import { Tools } from "grommet-icons";
+import Link from "next/link";
 
 export default function TestHubPage() {
   return (
@@ -43,9 +44,9 @@ export default function TestHubPage() {
           <Button label="📍 Test Location" fill secondary />
         </a>
 
-        <a href="/" style={{ textDecoration: "none" }}>
+        <Link href="/" style={{ textDecoration: "none" }}>
           <Button label="← Back to Home" fill />
-        </a>
+        </Link>
       </Box>
     </Box>
   );

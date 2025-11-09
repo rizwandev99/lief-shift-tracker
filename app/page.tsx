@@ -1,43 +1,29 @@
-import Link from "next/link";
-import ClockInterface from "./components/clock-interface";
 import LoginForm from "./components/login-form";
-import { auth0 } from "@/lib/auth0";
-import { redirect } from "next/navigation";
 import LoginButton from "./components/login-button";
+import { AuthRedirect } from "./components/auth-redirect";
+import Image from "next/image";
 
 export default async function HomePage() {
-   const session = await auth0.getSession();
-
-   // If user is authenticated, redirect based on role
-   if (session?.user) {
-     // Import prisma client dynamically to avoid SSR issues
-     const { default: prisma } = await import("@/lib/prisma");
-     const user = await prisma.users.findUnique({
-       where: { email: session.user.email },
-       select: { role: true },
-     });
-
-     if (user?.role === "manager" || user?.role === "admin") {
-       // Redirect managers to manager dashboard
-       redirect("/manager");
-     } else {
-       // Redirect workers to worker dashboard
-       redirect("/worker");
-     }
-   }
+  // For now, just show the landing page
+  // Authentication redirects will be handled client-side to avoid NEXT_REDIRECT issues
 
   // Landing page for unauthenticated users
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+    <>
+      <AuthRedirect />
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
       {/* Header */}
       <header className="relative z-10 px-4 py-6 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center space-x-2">
-            <img
-              src="/lief-logo-with-name.svg"
-              alt="Lief Logo"
-              className="h-8 w-auto"
-            />
+            <div className="flex items-center space-x-2">
+              <Image
+                src="/lief-logo-with-name.svg"
+                alt="Lief Logo"
+                width={100}
+                height={32}
+                priority
+                className="h-8 w-auto"
+              />
           </div>
           <div className="flex items-center space-x-8">
             <nav className="hidden md:flex space-x-8">
@@ -169,7 +155,7 @@ export default async function HomePage() {
               <p className="text-gray-600 text-lg">Join healthcare professionals using our platform</p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
               <div className="text-center group">
                 <div className="text-4xl font-bold text-emerald-600 mb-3 group-hover:scale-110 transition-transform duration-300">268+</div>
                 <div className="text-gray-700 font-medium">Shifts Tracked</div>
@@ -177,10 +163,6 @@ export default async function HomePage() {
               <div className="text-center group">
                 <div className="text-4xl font-bold text-emerald-600 mb-3 group-hover:scale-110 transition-transform duration-300">12</div>
                 <div className="text-gray-700 font-medium">Active Staff</div>
-              </div>
-              <div className="text-center group">
-                <div className="text-4xl font-bold text-emerald-600 mb-3 group-hover:scale-110 transition-transform duration-300">1</div>
-                <div className="text-gray-700 font-medium">Organization</div>
               </div>
               <div className="text-center group">
                 <div className="text-4xl font-bold text-emerald-600 mb-3 group-hover:scale-110 transition-transform duration-300">99.9%</div>
@@ -196,9 +178,12 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <img
+              <Image
                 src="/lief-logo-with-name.svg"
                 alt="Lief Logo"
+                width={100}
+                height={32}
+                priority
                 className="h-8 w-auto"
               />
               <span className="text-gray-300 text-sm">&copy; 2025 Lief Healthcare. All rights reserved.</span>
@@ -212,6 +197,7 @@ export default async function HomePage() {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 }

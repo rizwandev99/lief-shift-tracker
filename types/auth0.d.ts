@@ -1,17 +1,36 @@
 declare module "@auth0/nextjs-auth0" {
-  export function handleAuth(...args: any[]): any;
-  export function handleLogin(...args: any[]): any;
-  export function handleLogout(...args: any[]): any;
-  export function handleCallback(...args: any[]): any;
-  export function getSession(...args: any[]): any;
-  export function withApiAuthRequired(...args: any[]): any;
-  const _default: any;
+  import { NextApiRequest, NextApiResponse } from "next";
+
+  export function handleAuth(req: NextApiRequest, res: NextApiResponse): unknown;
+  export function handleLogin(req: NextApiRequest, res: NextApiResponse): unknown;
+  export function handleLogout(req: NextApiRequest, res: NextApiResponse): unknown;
+  export function handleCallback(req: NextApiRequest, res: NextApiResponse): unknown;
+  export function getSession(req: NextApiRequest, res: NextApiResponse): unknown;
+  export function withApiAuthRequired(apiRoute: (req: NextApiRequest, res: NextApiResponse) => unknown): (req: NextApiRequest, res: NextApiResponse) => unknown;
+  
+  const _default: {
+    handleAuth: typeof handleAuth;
+    handleLogin: typeof handleLogin;
+    handleLogout: typeof handleLogout;
+    handleCallback: typeof handleCallback;
+    getSession: typeof getSession;
+    withApiAuthRequired: typeof withApiAuthRequired;
+  };
   export default _default;
 }
 
 declare module "@auth0/nextjs-auth0/client" {
   import type { ReactNode, FC } from "react";
+
+  interface User {
+    name?: string | null;
+    email?: string | null;
+    picture?: string | null;
+    sub?: string | null;
+    [key: string]: unknown;
+  }
+
   export const UserProvider: FC<{ children?: ReactNode }>;
-  export function useUser(): { user?: any; isLoading: boolean; error?: any };
-  export function getAccessToken(...args: any[]): any;
+  export function useUser(): { user?: User; isLoading: boolean; error?: Error };
+  export function getAccessToken(...args: unknown[]): Promise<string | undefined>;
 }

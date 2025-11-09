@@ -25,7 +25,4 @@ if (process.env.NODE_ENV !== "production") {
 
 export default prisma;
 
-export type {
-  users as User,
-  shifts as Shift,
-} from "@prisma/client";
+export type { users as User, shifts as Shift } from "@prisma/client";

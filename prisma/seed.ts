@@ -7,6 +7,7 @@ async function main() {
   console.log("🧹 Clearing existing data...");
   await prisma.shifts.deleteMany({});
   await prisma.users.deleteMany({});
+  await prisma.organizations.deleteMany({});
 
   // Create sample users (mix of workers and managers)
   await prisma.users.createMany({
@@ -158,7 +159,19 @@ async function main() {
     data: shifts,
   });
 
+  // Create organization
+  await prisma.organizations.create({
+    data: {
+      id: "city-general",
+      name: "City General Hospital",
+      latitude: 12.9716,
+      longitude: 77.5946,
+      radius: 200,
+    },
+  });
+
   console.log(`✅ Seed data inserted successfully:`);
+  console.log(`   - 1 organization (City General Hospital)`);
   console.log(`   - 12 users (workers and managers)`);
   console.log(`   - ${shifts.length} shifts generated`);
 }

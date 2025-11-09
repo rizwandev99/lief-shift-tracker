@@ -11,7 +11,6 @@ generator client {
 datasource db {
   provider  = "postgresql"           // We're using PostgreSQL (Supabase)
   url       = env("DATABASE_URL")    // Pooled connection for app operations
-  directUrl = env("DIRECT_URL")      // Direct connection for migrations
 }
 
 
@@ -78,4 +77,24 @@ model shifts {
   @@index([user_id])                    // Fast lookup of user's shifts
   @@index([clock_in_time])              // Fast lookup by date/time
   @@index([user_id, clock_out_time])    // Fast lookup of active shifts
+}
+
+// 🏥 ORGANIZATIONS MODEL
+// This represents healthcare organizations (hospitals, clinics, etc.)
+model organizations {
+ // 📋 PRIMARY KEY: Unique identifier for each organization
+ id              String   @id @default(cuid())
+
+ // 🏥 ORGANIZATION DETAILS
+ name            String   @unique              // Organization name (e.g., "City General Hospital")
+ latitude        Float                       // GPS latitude for location validation
+ longitude       Float                       // GPS longitude for location validation
+ radius          Int      @default(200)       // Geofence radius in meters
+
+ // ⏰ TIMESTAMPS
+ created_at      DateTime @default(now())      // When organization was added
+ updated_at      DateTime @updatedAt           // Last time organization was updated
+
+ // 🎯 TABLE NAME MAPPING
+ @@map("organizations")
 }

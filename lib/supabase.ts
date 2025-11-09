@@ -12,10 +12,4 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Export types for TypeScript (we'll use these later)
-export type Database = {
-  public: {
-    Tables: {
-      // We'll define our database tables here later
-    };
-  };
-};
+export type Database = Record<string, unknown>;

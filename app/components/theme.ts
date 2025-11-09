@@ -3,7 +3,7 @@
 
 import type { ThemeType } from "grommet";
 
-export const customTheme: ThemeType = {
+export const lightTheme: ThemeType = {
   // Main colors for our healthcare app
   global: {
     colors: {

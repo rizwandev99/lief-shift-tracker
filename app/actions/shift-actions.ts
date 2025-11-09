@@ -5,11 +5,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { auth0 } from "@/lib/auth0";
 import prisma from "@/lib/prisma";
-import { success, z } from "zod";
-import { ja } from "zod/locales";
+import { z } from "zod";
 
 // 📋 VALIDATION SCHEMAS - Define what data we expect from the client
 const LocationSchema = z.object({
@@ -61,37 +59,43 @@ function calculateDistance(
  */
 async function getCurrentUser() {
   try {
-    // In development mode, if no session, use the first seeded user for testing
+    // In development mode, use a simpler approach
     if (process.env.NODE_ENV === "development") {
+      // Try to get the authenticated user first
       try {
         const session = await auth0.getSession();
-        if (!session?.user?.email) {
-          // Use first seeded user for development testing
-          const testUser = await prisma.users.findFirst({});
-          if (testUser) {
-            return testUser;
+        if (session?.user?.email) {
+          // Get user from database using Auth0 email
+          const user = await prisma.users.findUnique({
+            where: { email: session.user.email },
+          });
+
+          if (user) {
+            return user;
           }
-          throw new Error("No users found in database");
         }
-
-        // Get user from database using Auth0 email
-        const user = await prisma.users.findUnique({
-          where: { email: session.user.email },
-        });
-
-        if (!user) {
-          throw new Error("User not found in database");
-        }
-
-        return user;
       } catch (authError) {
-        // Fallback to test user if Auth0 fails in development
-        const testUser = await prisma.users.findFirst({});
-        if (testUser) {
-          return testUser;
-        }
-        throw authError;
+        console.log("Auth0 session not available, using fallback");
       }
+
+      // Fallback: Use first manager user for development testing
+      const managerUser = await prisma.users.findFirst({
+        where: { role: "manager" },
+      });
+
+      if (managerUser) {
+        console.log("Using fallback manager user for development:", managerUser.email);
+        return managerUser;
+      }
+
+      // Last resort: Use any user
+      const anyUser = await prisma.users.findFirst({});
+      if (anyUser) {
+        console.log("Using fallback user for development:", anyUser.email);
+        return anyUser;
+      }
+
+      throw new Error("No users found in database");
     } else {
       // Production mode - require proper Auth0 authentication
       const session = await auth0.getSession();
@@ -141,13 +145,11 @@ export async function clockInAction(formData: FormData) {
     // 2️⃣ Get authenticated user
     const user = await getCurrentUser();
 
-    // 3️⃣ Hardcoded organization details for "City General Hospital"
-    const organization = {
-      name: "City General Hospital",
-      latitude: 12.9716,
-      longitude: 77.5946,
-      radius: 200,
-    };
+    // 3️⃣ Get organization details from database
+    const organization = await prisma.organizations.findFirst();
+    if (!organization) {
+      throw new Error("No organization configured. Please contact your administrator.");
+    }
 
     // 4️⃣ Validate user is within organization's geofence
     const distance = calculateDistance(
@@ -247,13 +249,11 @@ export async function clockOutAction(formData: FormData) {
       throw new Error("This shift has already been closed");
     }
 
-    // 6️⃣ Hardcoded organization details for "City General Hospital"
-    const organization = {
-      name: "City General Hospital",
-      latitude: 12.9716,
-      longitude: 77.5946,
-      radius: 200,
-    };
+    // 6️⃣ Get organization details from database
+    const organization = await prisma.organizations.findFirst();
+    if (!organization) {
+      throw new Error("No organization configured. Please contact your administrator.");
+    }
 
     // 7️⃣ Validate user is within organization's geofence
     const distance = calculateDistance(
@@ -278,7 +278,7 @@ export async function clockOutAction(formData: FormData) {
       Math.round((shiftDurationMs / (1000 * 60 * 60)) * 100) / 100;
 
     // 9️⃣ Update shift record with clock-out info
-    const updatedShift = await prisma.shifts.update({
+    await prisma.shifts.update({
       where: { id: shift.id },
 
       data: {
@@ -377,8 +377,8 @@ export async function getActiveStaffAction() {
     const user = await getCurrentUser();
 
     // Check if user has manager or admin role
-    if (user.role !== 'manager' && user.role !== 'admin') {
-      throw new Error('Access denied. Manager or admin role required.');
+    if (user.role !== "manager" && user.role !== "admin") {
+      throw new Error("Access denied. Manager or admin role required.");
     }
 
     const activeStaff = await prisma.shifts.findMany({
@@ -421,8 +421,8 @@ export async function getAllStaffHistoryAction() {
     const user = await getCurrentUser();
 
     // Check if user has manager or admin role
-    if (user.role !== 'manager' && user.role !== 'admin') {
-      throw new Error('Access denied. Manager or admin role required.');
+    if (user.role !== "manager" && user.role !== "admin") {
+      throw new Error("Access denied. Manager or admin role required.");
     }
 
     const staffHistory = await prisma.shifts.findMany({
@@ -466,8 +466,8 @@ export async function getAnalyticsAction() {
     const user = await getCurrentUser();
 
     // Check if user has manager or admin role
-    if (user.role !== 'manager' && user.role !== 'admin') {
-      throw new Error('Access denied. Manager or admin role required.');
+    if (user.role !== "manager" && user.role !== "admin") {
+      throw new Error("Access denied. Manager or admin role required.");
     }
 
     // Get data for last 7 days
@@ -495,6 +495,7 @@ export async function getAnalyticsAction() {
       include: {
         user: {
           select: {
+            id: true,
             email: true,
             name: true,
           },
@@ -566,8 +567,8 @@ export async function updateOrganizationSettingsAction(formData: FormData) {
     const user = await getCurrentUser();
 
     // Check if user has manager or admin role
-    if (user.role !== 'manager' && user.role !== 'admin') {
-      throw new Error('Access denied. Manager or admin role required.');
+    if (user.role !== "manager" && user.role !== "admin") {
+      throw new Error("Access denied. Manager or admin role required.");
     }
 
     const radius = parseFloat(formData.get("radius") as string);
@@ -578,14 +579,20 @@ export async function updateOrganizationSettingsAction(formData: FormData) {
       throw new Error("All fields are required");
     }
 
-    // Since there's only one organization, hardcode the update
-    // In a real app, you might store this in a config file or separate table
-    // For now, just return success without actual update
+    // Update the organization settings in database
+    await prisma.organizations.updateMany({
+      data: {
+        latitude: parseFloat(formData.get("latitude") as string),
+        longitude: parseFloat(formData.get("longitude") as string),
+        radius: parseInt(formData.get("radius") as string),
+      },
+    });
+
     revalidatePath("/manager");
 
     return {
       success: true,
-      message: `Updated City General Hospital location settings`,
+      message: `Updated organization location settings`,
     };
   } catch (error) {
     console.error("Update organization error:", error);
@@ -608,18 +615,20 @@ export async function getOrganizationSettingsAction() {
     const user = await getCurrentUser();
 
     // Check if user has manager or admin role
-    if (user.role !== 'manager' && user.role !== 'admin') {
-      throw new Error('Access denied. Manager or admin role required.');
+    if (user.role !== "manager" && user.role !== "admin") {
+      throw new Error("Access denied. Manager or admin role required.");
     }
 
     // Hardcoded organization settings for "City General Hospital"
-    const organizations = [{
-      id: "city-general",
-      name: "City General Hospital",
-      latitude: 12.9716,
-      longitude: 77.5946,
-      radius: 200,
-    }];
+    const organizations = [
+      {
+        id: "city-general",
+        name: "City General Hospital",
+        latitude: 12.9716,
+        longitude: 77.5946,
+        radius: 200,
+      },
+    ];
 
     return {
       success: true,

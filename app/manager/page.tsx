@@ -2,9 +2,9 @@
 // Manager dashboard for healthcare shift tracking - Following naming conventions
 "use client";
 
-import { useState, useEffect } from "react";
-// @ts-ignore
-import { useUser } from "@auth0/nextjs-auth0";
+import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
+import { useUser } from "@auth0/nextjs-auth0/client";
 import {
   LineChart,
   Line,
@@ -17,6 +17,7 @@ import {
   Bar,
   Legend,
   Cell,
+  ComposedChart,
 } from "recharts";
 import {
   getActiveStaffAction,
@@ -39,7 +40,7 @@ interface ActiveStaffMember {
 interface StaffHistoryEntry {
   id: string;
   clock_in_time: string | Date;
-  clock_out_time: string | Date;
+  clock_out_time: string | Date | null;
   user: {
     id: string;
     email: string;
@@ -70,74 +71,110 @@ export default function ManagerDashboard() {
   const [activeStaff, setActiveStaff] = useState<ActiveStaffMember[]>([]);
   const [staffHistory, setStaffHistory] = useState<StaffHistoryEntry[]>([]);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [organizationSettings, setOrganizationSettings] = useState<OrganizationSettings[]>([]);
+  const [organizationSettings, setOrganizationSettings] = useState<
+    OrganizationSettings[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
     "overview" | "active" | "history" | "settings"
   >("overview");
   const [settingsLoading, setSettingsLoading] = useState(false);
-  const [settingsMessage, setSettingsMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [settingsMessage, setSettingsMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+
+  const checkUserRole = useCallback(async () => {
+    try {
+      // Get user role from database based on email
+      const userEmail = user?.email;
+      if (!userEmail) {
+        setUserRole("error");
+        return;
+      }
+
+      // Call server action to check user role instead of using Prisma directly
+      const response = await fetch("/api/check-user-role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: userEmail }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && (data.role === "manager" || data.role === "admin")) {
+        setUserRole(data.role);
+      } else {
+        // Redirect non-managers
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Error checking user role:", error);
+      // Show error message instead of redirecting immediately
+      setUserRole("error");
+    }
+  }, [user?.email]);
 
   // Load data when component mounts
   useEffect(() => {
     if (user && !userLoading && userRole === null) {
       checkUserRole();
     }
-  }, [user, userLoading, userRole]);
+  }, [user, userLoading, userRole, checkUserRole]);
 
-  // Load data after role is verified
+  // Load dashboard data when user is authenticated and has proper role
   useEffect(() => {
-    if (userRole && userRole !== 'error') {
+    if (user && userRole && (userRole === "manager" || userRole === "admin")) {
+      console.log("Manager authenticated, loading dashboard data");
       loadAllData();
       loadOrganizationSettings();
     }
-  }, [userRole]);
+  }, [user, userRole]);
 
-  const checkUserRole = async () => {
-    try {
-      // Get user role from database based on email
-      const userEmail = user?.email;
-      if (!userEmail) {
-        setUserRole('error');
-        return;
+  // Helper function to retry failed operations
+  const retryOperation = async (
+    operation: () => Promise<any>,
+    maxRetries = 3,
+    delay = 2000
+  ) => {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        if (attempt === maxRetries) throw error;
+        console.log(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
-
-      // Call server action to check user role instead of using Prisma directly
-      const response = await fetch('/api/check-user-role', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: userEmail }),
-      });
-
-      const data = await response.json();
-
-      if (data.success && (data.role === 'manager' || data.role === 'admin')) {
-        setUserRole(data.role);
-      } else {
-        // Redirect non-managers
-        window.location.href = '/';
-      }
-    } catch (error) {
-      console.error('Error checking user role:', error);
-      // Show error message instead of redirecting immediately
-      setUserRole('error');
     }
   };
 
   const loadAllData = async () => {
+    console.log("Starting loadAllData...");
     setLoading(true);
+
     try {
-      const [activeResult, historyResult, analyticsResult] = await Promise.all([
-        getActiveStaffAction(),
-        getAllStaffHistoryAction(),
-        getAnalyticsAction(),
+      console.log("Making API calls...");
+
+      // Execute data fetching operations with retries and proper error handling
+      const results = await Promise.allSettled([
+        retryOperation(() => getActiveStaffAction()),
+        retryOperation(() => getAllStaffHistoryAction()),
+        retryOperation(() => getAnalyticsAction()),
       ]);
 
-      if (activeResult.success) {
+      console.log("All operations completed");
+
+      // Process results with improved error handling
+      const [activeResult, historyResult, analyticsResult] = results;
+
+      console.log("Processing results...");
+
+      // Handle active staff
+      if (activeResult.status === "fulfilled" && activeResult.value.success) {
         const mappedActive: ActiveStaffMember[] = (
-          activeResult.activeStaff || []
-        ).map((s: any) => ({
+          activeResult.value.activeStaff || []
+        ).map((s: ActiveStaffMember) => ({
           id: s.id,
           clock_in_time: s.clock_in_time,
           user: {
@@ -147,12 +184,17 @@ export default function ManagerDashboard() {
           },
         }));
         setActiveStaff(mappedActive);
+        console.log("Active staff loaded:", mappedActive.length);
+      } else {
+        setActiveStaff([]);
+        console.log("Active staff failed or empty");
       }
 
-      if (historyResult.success) {
+      // Handle history
+      if (historyResult.status === "fulfilled" && historyResult.value.success) {
         const mappedHistory: StaffHistoryEntry[] = (
-          historyResult.staffHistory || []
-        ).map((s: any) => ({
+          historyResult.value.staffHistory || []
+        ).map((s: StaffHistoryEntry) => ({
           id: s.id,
           clock_in_time: s.clock_in_time,
           clock_out_time: s.clock_out_time,
@@ -163,14 +205,22 @@ export default function ManagerDashboard() {
           },
         }));
         setStaffHistory(mappedHistory);
+        console.log("History loaded:", mappedHistory.length);
+      } else {
+        setStaffHistory([]);
+        console.log("History failed or empty");
       }
 
-      if (analyticsResult.success) {
-        const a = analyticsResult.analytics || null;
+      // Handle analytics
+      if (
+        analyticsResult.status === "fulfilled" &&
+        analyticsResult.value.success
+      ) {
+        const a = analyticsResult.value.analytics || null;
         if (a) {
           const mappedShifts: StaffHistoryEntry[] = (
             a.shiftsLastWeek || []
-          ).map((s: any) => ({
+          ).map((s: StaffHistoryEntry) => ({
             id: s.id,
             clock_in_time: s.clock_in_time,
             clock_out_time: s.clock_out_time,
@@ -190,13 +240,43 @@ export default function ManagerDashboard() {
           };
 
           setAnalytics(mappedAnalytics);
+          console.log("Analytics loaded");
         } else {
-          setAnalytics(null);
+          setAnalytics({
+            activeToday: 0,
+            avgHoursPerDay: 0,
+            totalShiftsLastWeek: 0,
+            dailyClockIns: [],
+            shiftsLastWeek: [],
+          });
+          console.log("Analytics empty - using defaults");
         }
+      } else {
+        // Set default analytics data when database is unavailable
+        setAnalytics({
+          activeToday: 0,
+          avgHoursPerDay: 0,
+          totalShiftsLastWeek: 0,
+          dailyClockIns: [],
+          shiftsLastWeek: [],
+        });
+        console.log("Analytics failed - using defaults");
       }
     } catch (error) {
-      console.error("Error loading data:", error);
+      console.error("Error in loadAllData:", error);
+
+      // Set fallback data when database is completely unavailable
+      setActiveStaff([]);
+      setStaffHistory([]);
+      setAnalytics({
+        activeToday: 0,
+        avgHoursPerDay: 0,
+        totalShiftsLastWeek: 0,
+        dailyClockIns: [],
+        shiftsLastWeek: [],
+      });
     } finally {
+      console.log("Setting loading to false");
       setLoading(false);
     }
   };
@@ -235,14 +315,23 @@ export default function ManagerDashboard() {
       const result = await updateOrganizationSettingsAction(formData);
 
       if (result.success) {
-        setSettingsMessage({ type: 'success', text: result.message || 'Settings updated successfully' });
+        setSettingsMessage({
+          type: "success",
+          text: result.message || "Settings updated successfully",
+        });
         await loadOrganizationSettings(); // Reload settings
         await loadAllData(); // Reload analytics in case organization changes affect data
       } else {
-        setSettingsMessage({ type: 'error', text: result.error || 'Failed to update settings' });
+        setSettingsMessage({
+          type: "error",
+          text: result.error || "Failed to update settings",
+        });
       }
-    } catch (error) {
-      setSettingsMessage({ type: 'error', text: 'An unexpected error occurred' });
+    } catch {
+      setSettingsMessage({
+        type: "error",
+        text: "An unexpected error occurred",
+      });
     } finally {
       setSettingsLoading(false);
     }
@@ -255,7 +344,9 @@ export default function ManagerDashboard() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading Manager Dashboard...</p>
-          <p className="text-sm text-gray-500 mt-2">Verifying your account permissions</p>
+          <p className="text-sm text-gray-500 mt-2">
+            Verifying your account permissions
+          </p>
         </div>
       </div>
     );
@@ -268,14 +359,16 @@ export default function ManagerDashboard() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading Dashboard Data...</p>
-          <p className="text-sm text-gray-500 mt-2">Fetching analytics and staff information</p>
+          <p className="text-sm text-gray-500 mt-2">
+            Fetching analytics and staff information
+          </p>
         </div>
       </div>
     );
   }
 
   // Error state
-  if (userRole === 'error') {
+  if (userRole === "error") {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-md">
@@ -283,7 +376,8 @@ export default function ManagerDashboard() {
             ⚠️ Connection Error
           </h2>
           <p className="text-emerald-700 mb-6 leading-relaxed">
-            Unable to verify your account permissions. Please try logging in again.
+            Unable to verify your account permissions. Please try logging in
+            again.
           </p>
           <a
             href="/auth/login"
@@ -326,9 +420,12 @@ export default function ManagerDashboard() {
           <div className="flex justify-between items-center py-6">
             <div>
               <div className="flex items-center space-x-2 mb-2">
-                <img
+                <Image
                   src="/lief-logo-with-name.svg"
                   alt="Lief Logo"
+                  width={100}
+                  height={32}
+                  priority
                   className="h-8 w-auto"
                 />
                 <span className="text-sm text-gray-500">Manager Dashboard</span>
@@ -337,11 +434,11 @@ export default function ManagerDashboard() {
                 Welcome,{" "}
                 {formatUserName({
                   name: user?.name,
-                  email: user?.email,
+                  email: user?.email || "",
                 })}
               </p>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 items-center">
               <button
                 onClick={loadAllData}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-emerald-200/50"
@@ -379,7 +476,11 @@ export default function ManagerDashboard() {
             ].map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key as any)}
+                onClick={() =>
+                  setActiveTab(
+                    tab.key as "overview" | "active" | "history" | "settings"
+                  )
+                }
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.key
                     ? "border-emerald-500 text-emerald-600"
@@ -561,72 +662,6 @@ export default function ManagerDashboard() {
               </div>
             </div>
 
-            {/* Organization Performance */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                🏥 Organization Performance
-              </h3>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    layout="horizontal"
-                    data={[
-                      {
-                        metric: "Active Staff",
-                        value: Math.min((analytics.activeToday / 12) * 100, 100),
-                        target: 100,
-                        color: "#10b981"
-                      },
-                      {
-                        metric: "Weekly Activity",
-                        value: Math.min((analytics.totalShiftsLastWeek / 50) * 100, 100),
-                        target: 100,
-                        color: "#059669"
-                      },
-                      {
-                        metric: "Efficiency",
-                        value: 95,
-                        target: 100,
-                        color: "#047857"
-                      }
-                    ]}
-                    margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" domain={[0, 100]} />
-                    <YAxis dataKey="metric" type="category" width={90} />
-                    <Tooltip
-                      formatter={(value: number, name: string) => [
-                        `${value.toFixed(1)}%`,
-                        name === "value" ? "Current" : "Target"
-                      ]}
-                      contentStyle={{
-                        backgroundColor: "#ffffff",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "6px",
-                        color: "#000000",
-                      }}
-                      labelStyle={{ color: "#000000", fontWeight: "bold" }}
-                    />
-                    <Legend />
-                    <Bar dataKey="value" fill="#10b981" radius={[0, 4, 4, 0]}>
-                      {[
-                        { metric: "Active Staff", value: Math.min((analytics.activeToday / 12) * 100, 100), color: "#10b981" },
-                        { metric: "Weekly Activity", value: Math.min((analytics.totalShiftsLastWeek / 50) * 100, 100), color: "#059669" },
-                        { metric: "Efficiency", value: 95, color: "#047857" }
-                      ].map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-4 text-center">
-                <h4 className="text-lg font-semibold text-gray-900">City General Hospital</h4>
-                <p className="text-sm text-gray-600">Performance metrics and activity levels</p>
-              </div>
-            </div>
-
             {/* Recent Activity */}
             <div className="bg-white p-6 rounded-lg shadow">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
@@ -648,14 +683,18 @@ export default function ManagerDashboard() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-gray-900">
-                        {calculateShiftDuration(
-                          shift.clock_in_time,
-                          shift.clock_out_time
-                        )}
+                        {shift.clock_out_time
+                          ? calculateShiftDuration(
+                              shift.clock_in_time,
+                              shift.clock_out_time
+                            )
+                          : "N/A"}
                         h
                       </p>
                       <p className="text-xs text-gray-500">
-                        {new Date(shift.clock_out_time).toLocaleDateString()}
+                        {shift.clock_out_time
+                          ? new Date(shift.clock_out_time).toLocaleDateString()
+                          : "In Progress"}
                       </p>
                     </div>
                   </div>
@@ -789,14 +828,18 @@ export default function ManagerDashboard() {
                           {new Date(shift.clock_in_time).toLocaleString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {new Date(shift.clock_out_time).toLocaleString()}
+                          {shift.clock_out_time
+                            ? new Date(shift.clock_out_time).toLocaleString()
+                            : "In Progress"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
-                            {calculateShiftDuration(
-                              shift.clock_in_time,
-                              shift.clock_out_time
-                            )}
+                            {shift.clock_out_time
+                              ? calculateShiftDuration(
+                                  shift.clock_in_time,
+                                  shift.clock_out_time
+                                )
+                              : "--"}
                             h
                           </span>
                         </td>
@@ -814,13 +857,16 @@ export default function ManagerDashboard() {
           <div className="space-y-6">
             {/* Success/Error Messages */}
             {settingsMessage && (
-              <div className={`p-4 rounded-lg border ${
-                settingsMessage.type === 'success'
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                  : 'bg-orange-50 border-orange-200 text-orange-800'
-              }`}>
+              <div
+                className={`p-4 rounded-lg border ${
+                  settingsMessage.type === "success"
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+                    : "bg-orange-50 border-orange-200 text-orange-800"
+                }`}
+              >
                 <p className="font-medium">
-                  {settingsMessage.type === 'success' ? '✅' : '⚠️'} {settingsMessage.text}
+                  {settingsMessage.type === "success" ? "✅" : "⚠️"}{" "}
+                  {settingsMessage.text}
                 </p>
               </div>
             )}
@@ -830,24 +876,31 @@ export default function ManagerDashboard() {
                 ⚙️ Organization Settings
               </h3>
               <p className="text-gray-600 mb-6">
-                Configure location perimeter settings for your organization. These settings control the geofencing rules for clock-in/clock-out operations.
+                Configure location perimeter settings for your organization.
+                These settings control the geofencing rules for
+                clock-in/clock-out operations.
               </p>
 
               <div className="space-y-6">
                 {organizationSettings.map((org) => (
-                <div key={org.id} className="border border-gray-200 rounded-lg p-6">
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">
-                    {org.name}
-                  </h4>
-
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      const formData = new FormData(e.target as HTMLFormElement);
-                      await handleUpdateOrganizationSettings(formData);
-                    }}
-                    className="space-y-4"
+                  <div
+                    key={org.id}
+                    className="border border-gray-200 rounded-lg p-6"
                   >
+                    <h4 className="text-lg font-medium text-gray-900 mb-4">
+                      {org.name}
+                    </h4>
+
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(
+                          e.target as HTMLFormElement
+                        );
+                        await handleUpdateOrganizationSettings(formData);
+                      }}
+                      className="space-y-4"
+                    >
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -857,7 +910,7 @@ export default function ManagerDashboard() {
                             type="number"
                             name="latitude"
                             step="0.000001"
-                            defaultValue={org.latitude || ''}
+                            defaultValue={org.latitude || ""}
                             required
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 placeholder-gray-500"
                             placeholder="e.g., 12.9716"
@@ -872,7 +925,7 @@ export default function ManagerDashboard() {
                             type="number"
                             name="longitude"
                             step="0.000001"
-                            defaultValue={org.longitude || ''}
+                            defaultValue={org.longitude || ""}
                             required
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 placeholder-gray-500"
                             placeholder="e.g., 77.5946"
@@ -888,7 +941,7 @@ export default function ManagerDashboard() {
                             name="radius"
                             min="50"
                             max="5000"
-                            defaultValue={org.radius || ''}
+                            defaultValue={org.radius || ""}
                             required
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-900 placeholder-gray-500"
                             placeholder="e.g., 200"
@@ -898,7 +951,11 @@ export default function ManagerDashboard() {
 
                       <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                         <div className="text-sm text-gray-600">
-                          <p>Current settings: Lat {org.latitude?.toFixed(4)}, Lng {org.longitude?.toFixed(4)}, Radius {org.radius}m</p>
+                          <p>
+                            Current settings: Lat {org.latitude?.toFixed(4)},
+                            Lng {org.longitude?.toFixed(4)}, Radius {org.radius}
+                            m
+                          </p>
                         </div>
 
                         <button
@@ -906,7 +963,7 @@ export default function ManagerDashboard() {
                           disabled={settingsLoading}
                           className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-200/50"
                         >
-                          {settingsLoading ? 'Updating...' : 'Update Settings'}
+                          {settingsLoading ? "Updating..." : "Update Settings"}
                         </button>
                       </div>
                     </form>
@@ -923,8 +980,13 @@ export default function ManagerDashboard() {
                 <div className="flex items-start">
                   <span className="text-emerald-500 mr-2">📍</span>
                   <div>
-                    <p className="font-medium text-gray-900">Location Validation</p>
-                    <p>Staff must be within the specified radius of their organization's coordinates to clock in or out.</p>
+                    <p className="font-medium text-gray-900">
+                      Location Validation
+                    </p>
+                    <p>
+                      Staff must be within the specified radius of their
+                      organization&apos;s coordinates to clock in or out.
+                    </p>
                   </div>
                 </div>
 
@@ -932,7 +994,10 @@ export default function ManagerDashboard() {
                   <span className="text-emerald-500 mr-2">🎯</span>
                   <div>
                     <p className="font-medium text-gray-900">GPS Accuracy</p>
-                    <p>Coordinates are validated using the Haversine formula for precise distance calculations.</p>
+                    <p>
+                      Coordinates are validated using the Haversine formula for
+                      precise distance calculations.
+                    </p>
                   </div>
                 </div>
 
@@ -940,7 +1005,10 @@ export default function ManagerDashboard() {
                   <span className="text-orange-500 mr-2">⚠️</span>
                   <div>
                     <p className="font-medium text-gray-900">Important Notes</p>
-                    <p>Changes to location settings will immediately affect all clock-in/clock-out operations for your organization.</p>
+                    <p>
+                      Changes to location settings will immediately affect all
+                      clock-in/clock-out operations for your organization.&apos;
+                    </p>
                   </div>
                 </div>
               </div>

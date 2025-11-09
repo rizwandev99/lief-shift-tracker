@@ -1,7 +1,7 @@
 // app/components/GrommetProvider.tsx
 "use client";
 import { Grommet } from "grommet";
-import { customTheme } from "./theme";
+import { lightTheme } from "./theme";
 import { ReactNode } from "react";
 
 // TypeScript interface for props
@@ -11,7 +11,7 @@ interface GrommetProviderProps {
 
 export function GrommetProvider({ children }: GrommetProviderProps) {
   return (
-    <Grommet theme={customTheme} full>
+    <Grommet theme={lightTheme} full>
       {children}
     </Grommet>
   );

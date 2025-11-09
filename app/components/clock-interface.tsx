@@ -3,8 +3,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// @ts-ignore
-import { useUser } from "@auth0/nextjs-auth0";
+import Image from "next/image";
+import { useUser } from "@auth0/nextjs-auth0/client";
 import { useGeolocation } from "../../hooks/use-geolocation";
 import {
   clockInAction,
@@ -226,9 +226,12 @@ export default function ClockInterface() {
         <div className="text-center mb-6">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center space-x-2">
-              <img
+              <Image
                 src="/lief-logo-with-name.svg"
                 alt="Lief Logo"
+                width={100}
+                height={32}
+                priority
                 className="h-8 w-auto"
               />
               <span className="text-sm text-gray-500">
@@ -275,7 +278,7 @@ export default function ClockInterface() {
             </div>
           ) : (
             <p className="text-emerald-700">
-              Click "Get Location" to enable location access
+              Click &ldquo;Get Location&rdquo; to enable location access
             </p>
           )}
         </div>

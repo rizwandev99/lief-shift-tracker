@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic"; // Add to your page
 // Using environment variable for base URL - cleaner approach
 
 import { Box, Heading, Text, Button } from "grommet";
-import { Lock, Login, Logout, User } from "grommet-icons";
+import { Lock, Login, Logout } from "grommet-icons";
 import { auth0 } from "@/lib/auth0";
 
 export default async function TestAuthPage() {

@@ -14,7 +14,7 @@ export default function TestDatabase() {
     async function testConnection() {
       try {
         // Try to fetch from users table
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from("users")
           .select("*")
           .limit(1);
@@ -24,7 +24,7 @@ export default function TestDatabase() {
         } else {
           setConnectionStatus("✅ Database connected successfully!");
         }
-      } catch (err) {
+      } catch {
         setConnectionStatus("❌ Connection failed");
       }
     }
