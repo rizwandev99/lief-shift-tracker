@@ -133,11 +133,11 @@ export default function ManagerDashboard() {
   }, [user, userRole]);
 
   // Helper function to retry failed operations
-  const retryOperation = async (
-    operation: () => Promise<any>,
+  const retryOperation = async <T,>(
+    operation: () => Promise<T>,
     maxRetries = 3,
     delay = 2000
-  ) => {
+  ): Promise<T | undefined> => {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         return await operation();
@@ -171,9 +171,9 @@ export default function ManagerDashboard() {
       console.log("Processing results...");
 
       // Handle active staff
-      if (activeResult.status === "fulfilled" && activeResult.value.success) {
+      if (activeResult.status === "fulfilled" && activeResult.value?.success) {
         const mappedActive: ActiveStaffMember[] = (
-          activeResult.value.activeStaff || []
+          activeResult.value?.activeStaff || []
         ).map((s: ActiveStaffMember) => ({
           id: s.id,
           clock_in_time: s.clock_in_time,
@@ -191,9 +191,12 @@ export default function ManagerDashboard() {
       }
 
       // Handle history
-      if (historyResult.status === "fulfilled" && historyResult.value.success) {
+      if (
+        historyResult.status === "fulfilled" &&
+        historyResult.value?.success
+      ) {
         const mappedHistory: StaffHistoryEntry[] = (
-          historyResult.value.staffHistory || []
+          historyResult.value?.staffHistory || []
         ).map((s: StaffHistoryEntry) => ({
           id: s.id,
           clock_in_time: s.clock_in_time,
@@ -214,9 +217,9 @@ export default function ManagerDashboard() {
       // Handle analytics
       if (
         analyticsResult.status === "fulfilled" &&
-        analyticsResult.value.success
+        analyticsResult.value?.success
       ) {
-        const a = analyticsResult.value.analytics || null;
+        const a = analyticsResult.value?.analytics || null;
         if (a) {
           const mappedShifts: StaffHistoryEntry[] = (
             a.shiftsLastWeek || []

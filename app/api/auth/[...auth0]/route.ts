@@ -1,10 +1,6 @@
-import { auth0 } from "@/lib/auth0";
-import { NextRequest } from "next/server";
+import { createAuthServer } from "@auth0/nextjs-auth0/server";
 
-export async function GET(request: NextRequest) {
-  return await auth0.handleAuth(request);
-}
+const handler = createAuthServer();
 
-export async function POST(request: NextRequest) {
-  return await auth0.handleAuth(request);
-}
+export const GET = handler.auth;
+export const POST = handler.auth;
