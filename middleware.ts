@@ -1,19 +1,6 @@
-import { auth0 } from './lib/auth0';
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { withMiddlewareAuthRequired } from '@auth0/nextjs-auth0/edge';
 
-export async function middleware(request: NextRequest) {
-  try {
-    const session = await auth0.getSession(request);
-    if (!session) {
-      return NextResponse.redirect(new URL('/api/auth/login', request.url));
-    }
-    return NextResponse.next();
-  } catch (error) {
-    console.error('Auth0 middleware error:', error);
-    return NextResponse.redirect(new URL('/api/auth/login', request.url));
-  }
-}
+export default withMiddlewareAuthRequired();
 
 export const config = {
   matcher: [
