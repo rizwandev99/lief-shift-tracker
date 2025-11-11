@@ -1,42 +1,13 @@
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
-import { NextRequest, NextResponse } from "next/server";
+// Auth0 Routes
+// NOTE: In SDK v4, authentication routes are automatically mounted by middleware
+// at /auth/* endpoints. This file is not needed and routes are handled by middleware.
+// 
+// Available routes (auto-mounted by middleware):
+// - GET /auth/login - Initiate login
+// - GET /auth/logout - Logout user
+// - GET /auth/callback - Handle Auth0 callback
+// - GET /auth/profile - Get user profile
+// - GET /auth/access-token - Get access token
+// - POST /auth/backchannel-logout - Handle backchannel logout
 
-const auth0 = new Auth0Client();
-
-export async function GET(req: NextRequest) {
-  try {
-    const pathname = req.nextUrl.pathname;
-
-    // Handle login
-    if (pathname === "/api/auth/login") {
-      return await auth0.handleLogin(req);
-    }
-
-    // Handle logout
-    if (pathname === "/api/auth/logout") {
-      return await auth0.handleLogout(req);
-    }
-
-    // Handle callback
-    if (pathname === "/api/auth/callback") {
-      return await auth0.handleCallback(req);
-    }
-
-    // Handle profile
-    if (pathname === "/api/auth/profile") {
-      const session = await auth0.getSession(req);
-      if (!session) {
-        return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-      }
-      return NextResponse.json(session.user);
-    }
-
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  } catch (error) {
-    console.error("Auth0 error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Authentication error" },
-      { status: 500 }
-    );
-  }
-}
+export {};

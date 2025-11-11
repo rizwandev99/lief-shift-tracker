@@ -5,13 +5,9 @@ export const dynamic = "force-dynamic"; // Add to your page
 
 import { Box, Heading, Text, Button } from "grommet";
 import { Lock, Login, Logout } from "grommet-icons";
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
-import { headers } from "next/headers";
-
-const auth0 = new Auth0Client();
+import { auth0 } from "@/lib/auth0";
 
 export default async function TestAuthPage() {
-  const headerList = await headers();
   const session = await auth0.getSession();
   const user = session?.user;
 
@@ -20,20 +16,20 @@ export default async function TestAuthPage() {
   const returnPath = "/test/auth";
   const fullReturnUrl = `${baseUrl}${returnPath}`;
 
-  console.log('Auth test page - Session:', !!session, 'User:', !!user);
-  console.log('Base URL:', baseUrl, 'Return URL:', fullReturnUrl);
-  console.log('APP_BASE_URL env:', process.env.APP_BASE_URL);
-  console.log('AUTH0_BASE_URL env:', process.env.AUTH0_BASE_URL);
+  console.log("Auth test page - Session:", !!session, "User:", !!user);
+  console.log("Base URL:", baseUrl, "Return URL:", fullReturnUrl);
+  console.log("APP_BASE_URL env:", process.env.APP_BASE_URL);
+  console.log("AUTH0_BASE_URL env:", process.env.AUTH0_BASE_URL);
 
   // Force dynamic rendering to avoid caching issues
   const timestamp = Date.now();
 
   // If no session, redirect to login immediately for testing
   if (!session) {
-    console.log('No session found, redirecting to login...');
+    console.log("No session found, redirecting to login...");
     // Don't redirect automatically, let user click the button
   } else {
-    console.log('Session found! User authenticated.');
+    console.log("Session found! User authenticated.");
   }
 
   return (
@@ -78,7 +74,7 @@ export default async function TestAuthPage() {
 
             {/* Logout - using environment variable + path */}
             <a
-              href={`/api/auth/logout?returnTo=${encodeURIComponent(
+              href={`/auth/logout?returnTo=${encodeURIComponent(
                 fullReturnUrl
               )}`}
               style={{ textDecoration: "none" }}
@@ -109,7 +105,7 @@ export default async function TestAuthPage() {
 
             {/* Login - using environment variable + path */}
             <a
-              href={`/api/auth/login?returnTo=${encodeURIComponent(fullReturnUrl)}`}
+              href={`/auth/login?returnTo=${encodeURIComponent(fullReturnUrl)}`}
               style={{ textDecoration: "none" }}
             >
               <Button
@@ -121,13 +117,23 @@ export default async function TestAuthPage() {
             </a>
 
             {/* Debug Info */}
-            <Box background="light-2" pad="small" round="small" margin={{ top: "medium" }}>
+            <Box
+              background="light-2"
+              pad="small"
+              round="small"
+              margin={{ top: "medium" }}
+            >
               <Text size="small" color="dark-3">
-                <strong>Debug Info:</strong><br/>
-                Base URL: {baseUrl}<br/>
-                Return URL: {fullReturnUrl}<br/>
-                Session: {session ? 'Yes' : 'No'}<br/>
-                User: {user ? 'Yes' : 'No'}<br/>
+                <strong>Debug Info:</strong>
+                <br />
+                Base URL: {baseUrl}
+                <br />
+                Return URL: {fullReturnUrl}
+                <br />
+                Session: {session ? "Yes" : "No"}
+                <br />
+                User: {user ? "Yes" : "No"}
+                <br />
                 Timestamp: {timestamp}
               </Text>
             </Box>

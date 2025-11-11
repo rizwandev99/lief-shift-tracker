@@ -1,3 +1,3 @@
-// This file is intentionally minimal
-// Auth0 is configured automatically via environment variables
-// Use handleAuth() in route.ts and getSession()/useUser() in components
+import { Auth0Client } from '@auth0/nextjs-auth0/server';
+
+export const auth0 = new Auth0Client();

@@ -5,11 +5,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
+import { auth0 } from "@/lib/auth0";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
-
-const auth0 = new Auth0Client();
 
 // 📋 VALIDATION SCHEMAS - Define what data we expect from the client
 const LocationSchema = z.object({
@@ -86,7 +84,10 @@ async function getCurrentUser() {
       });
 
       if (managerUser) {
-        console.log("Using fallback manager user for development:", managerUser.email);
+        console.log(
+          "Using fallback manager user for development:",
+          managerUser.email
+        );
         return managerUser;
       }
 
@@ -150,7 +151,9 @@ export async function clockInAction(formData: FormData) {
     // 3️⃣ Get organization details from database
     const organization = await prisma.organizations.findFirst();
     if (!organization) {
-      throw new Error("No organization configured. Please contact your administrator.");
+      throw new Error(
+        "No organization configured. Please contact your administrator."
+      );
     }
 
     // 4️⃣ Validate user is within organization's geofence
@@ -254,7 +257,9 @@ export async function clockOutAction(formData: FormData) {
     // 6️⃣ Get organization details from database
     const organization = await prisma.organizations.findFirst();
     if (!organization) {
-      throw new Error("No organization configured. Please contact your administrator.");
+      throw new Error(
+        "No organization configured. Please contact your administrator."
+      );
     }
 
     // 7️⃣ Validate user is within organization's geofence
