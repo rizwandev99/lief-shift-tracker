@@ -5,6 +5,7 @@ This guide will help you properly configure your Lief Shift Tracker application 
 ## 📋 Prerequisites
 
 Before deploying to Vercel, ensure you have:
+
 - A GitHub repository with your code
 - A Vercel account (free tier available)
 - An Auth0 account (free tier available)
@@ -27,7 +28,8 @@ Before deploying to Vercel, ensure you have:
 
 1. Go to your application **Settings** tab
 2. Under **Application URIs**, set:
-   - **Allowed Callback URLs**: 
+
+   - **Allowed Callback URLs**:
      ```
      https://your-vercel-deployment.vercel.app/api/auth/callback
      http://localhost:3000/api/auth/callback
@@ -48,6 +50,7 @@ Before deploying to Vercel, ensure you have:
 ### Step 3: Get Your Auth0 Credentials
 
 From the **Settings** tab, copy:
+
 - **Domain** (e.g., `your-tenant.auth0.com`)
 - **Client ID**
 - **Client Secret**
@@ -84,6 +87,7 @@ Copy the generated string - you'll need it for Vercel.
 Before clicking **Deploy**, add these environment variables:
 
 #### **Auth0 Variables** (Required - Login won't work without these)
+
 ```
 AUTH0_SECRET=<your-generated-secret-from-step-4-above>
 AUTH0_DOMAIN=<your-auth0-domain>
@@ -93,6 +97,7 @@ APP_BASE_URL=https://your-vercel-deployment.vercel.app
 ```
 
 #### **Database Variables** (Optional - for full functionality)
+
 ```
 DATABASE_URL=<your-supabase-connection-string>
 DIRECT_URL=<your-supabase-direct-connection-string>
@@ -125,6 +130,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 **Cause**: Auth0 environment variables not set in Vercel
 
 **Fix**:
+
 1. Go to Vercel Project Settings
 2. Go to **Environment Variables**
 3. Add all Auth0 variables from the table above
@@ -135,6 +141,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 **Cause**: `APP_BASE_URL` doesn't match your Vercel deployment URL
 
 **Fix**:
+
 1. Update `APP_BASE_URL` in Vercel to match your exact deployment URL
 2. Update `Allowed Callback URLs` in Auth0 to match the Vercel URL
 3. Redeploy
@@ -144,6 +151,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 **Cause**: `AUTH0_CLIENT_ID` or `AUTH0_CLIENT_SECRET` is incorrect
 
 **Fix**:
+
 1. Double-check credentials in Auth0 Dashboard
 2. Update in Vercel Environment Variables
 3. Redeploy
@@ -153,6 +161,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 **Cause**: Auth0 domain not in `Allowed Web Origins`
 
 **Fix**:
+
 1. Go to Auth0 Dashboard → Your Application → Settings
 2. Add your Vercel URL to `Allowed Web Origins`
 3. Redeploy (or clear browser cache)
@@ -164,6 +173,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 After making code changes:
 
 1. Push to GitHub:
+
    ```bash
    git add .
    git commit -m "Your message"
@@ -173,6 +183,7 @@ After making code changes:
 2. Vercel automatically redeploys on push
 
 Or manually redeploy:
+
 1. Go to Vercel Dashboard
 2. Select your project
 3. Go to **Deployments**
@@ -184,12 +195,14 @@ Or manually redeploy:
 ## 🧪 Testing the Full App Flow
 
 ### For Care Workers:
+
 1. Log in with Auth0
 2. Click "Clock In" on the worker dashboard
 3. Allow location permission when prompted
 4. Verify shift appears in history
 
 ### For Managers:
+
 1. Log in with Auth0
 2. Access `/manager` to see analytics dashboard
 3. Verify you can see staff data and charts
@@ -222,10 +235,12 @@ Since geolocation is required for clock-in:
 If you're still having issues:
 
 1. Check Vercel Logs:
+
    - Go to **Deployments** → Click deployment → **Logs**
    - Look for error messages
 
 2. Check Auth0 Logs:
+
    - Go to Auth0 Dashboard → **Logs** (top-right)
    - See last login attempts and errors
 

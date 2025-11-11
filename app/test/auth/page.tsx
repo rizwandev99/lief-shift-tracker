@@ -5,10 +5,10 @@ export const dynamic = "force-dynamic"; // Add to your page
 
 import { Box, Heading, Text, Button } from "grommet";
 import { Lock, Login, Logout } from "grommet-icons";
-import { auth0 } from "@/lib/auth0";
+import { getSession } from "@auth0/nextjs-auth0";
 
 export default async function TestAuthPage() {
-  const session = await auth0.getSession();
+  const session = await getSession();
   const user = session?.user;
 
   // Get base URL from environment variable, fallback to localhost
@@ -74,7 +74,7 @@ export default async function TestAuthPage() {
 
             {/* Logout - using environment variable + path */}
             <a
-              href={`/auth/logout?returnTo=${encodeURIComponent(
+              href={`/api/auth/logout?returnTo=${encodeURIComponent(
                 fullReturnUrl
               )}`}
               style={{ textDecoration: "none" }}
@@ -105,7 +105,7 @@ export default async function TestAuthPage() {
 
             {/* Login - using environment variable + path */}
             <a
-              href={`/auth/login?returnTo=${encodeURIComponent(fullReturnUrl)}`}
+              href={`/api/auth/login?returnTo=${encodeURIComponent(fullReturnUrl)}`}
               style={{ textDecoration: "none" }}
             >
               <Button
