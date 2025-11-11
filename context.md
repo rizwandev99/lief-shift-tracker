@@ -49,7 +49,26 @@ Project is in development phase with core authentication and database infrastruc
 
 ## Active Issues & Solutions
 
-No active issues identified at this stage.
+**RESOLVED - Auth0 404 Error (November 11, 2025):**
+- Issue: Login redirected to `/auth/login` which returned 404
+- Root Cause: Incorrect Auth0 SDK implementation
+- Solution Applied:
+  - Updated `app/api/auth/[...auth0]/route.ts` to use `handleAuth()` from Auth0 SDK
+  - Updated `lib/auth0.ts` to use `initAuth0()` for proper SDK initialization
+  - Updated `middleware.ts` to use `withMiddlewareAuthRequired()` from Auth0
+  - Fixed login button to use correct route: `/api/auth/login`
+- Status: ✅ Fixed and verified
+- Verification:
+  - ✅ Route handler: Correctly exports `handleAuth()`
+  - ✅ Auth0 library: Correctly initializes with `initAuth0()`
+  - ✅ Middleware: Correctly uses `withMiddlewareAuthRequired()`
+  - ✅ Login button: Points to `/api/auth/login`
+  - ✅ Package.json: Has `@auth0/nextjs-auth0@^4.12.0` installed
+
+**Next Steps for Vercel Deployment:**
+- Add Auth0 environment variables to Vercel project settings
+- Update Auth0 application callback URLs to match Vercel deployment URL
+- Redeploy on Vercel
 
 ## Dependencies & Integrations
 
@@ -91,18 +110,19 @@ No active issues identified at this stage.
 - AUTH0_AUDIENCE: API identifier (optional)
 - AUTH0_SCOPE: Permission scopes (optional)
 
-**Auto-configured Routes:**
-- /auth/login: Login endpoint
-- /auth/logout: Logout endpoint
-- /auth/callback: Authentication callback
-- /auth/profile: User profile endpoint
-- /auth/access-token: Access token endpoint
+**Auto-configured Routes (via Dynamic Route Handler `[...auth0]`):**
+- /api/auth/login: Login endpoint (redirects to Auth0)
+- /api/auth/logout: Logout endpoint
+- /api/auth/callback: Authentication callback (OAuth redirect)
+- /api/auth/profile: User profile endpoint (returns user data)
+- /api/auth/access-token: Access token endpoint
 
 **Usage Patterns:**
 - Server components: Use `auth0.getSession()` for user data
 - Client components: Use `useUser()` hook from @auth0/nextjs-auth0
-- Login: Link to `/auth/login` with optional returnTo parameter
-- Logout: Link to `/auth/logout` with optional returnTo parameter
+- Login: Link to `/api/auth/login` (SDK automatically redirects to Auth0)
+- Logout: Link to `/api/auth/logout` (SDK automatically handles logout)
+- Protected routes: Use `withMiddlewareAuthRequired()` in middleware.ts
 
 ## Next Steps
 
