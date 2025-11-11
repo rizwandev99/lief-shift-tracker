@@ -5,9 +5,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getSession } from "@auth0/nextjs-auth0";
+import { Auth0Client } from "@auth0/nextjs-auth0/server";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+
+const auth0 = new Auth0Client();
 
 // 📋 VALIDATION SCHEMAS - Define what data we expect from the client
 const LocationSchema = z.object({
@@ -63,7 +65,7 @@ async function getCurrentUser() {
     if (process.env.NODE_ENV === "development") {
       // Try to get the authenticated user first
       try {
-        const session = await getSession();
+        const session = await auth0.getSession();
         if (session?.user?.email) {
           // Get user from database using Auth0 email
           const user = await prisma.users.findUnique({
@@ -98,7 +100,7 @@ async function getCurrentUser() {
       throw new Error("No users found in database");
     } else {
       // Production mode - require proper Auth0 authentication
-      const session = await getSession();
+      const session = await auth0.getSession();
       if (!session?.user?.email) {
         throw new Error("User not authenticated");
       }
