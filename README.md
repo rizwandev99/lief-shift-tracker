@@ -9,7 +9,19 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat-square&logo=postgresql)](https://postgresql.org)
 
 ---
+---
 
+## 📸 Screenshots/Gif's (wait to load 😅):
+
+![lief-shift-tracker GIF](public/lief-shift-tracker.gif)
+
+---
+
+## 🌐 Live Demo
+
+[View Live Demo](https://lief-shift-tracker-nine.vercel.app/)
+
+---
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
