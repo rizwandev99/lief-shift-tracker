@@ -53,21 +53,18 @@ Project is in development phase with core authentication and database infrastruc
 
 ## Active Issues & Solutions
 
-**RESOLVED - Auth0 404 Error (November 11, 2025):**
+**RESOLVED - Auth0 Route Handler Fix (December 17, 2025):**
 
-- Issue: Login redirected to `/auth/login` which returned 404
-- Root Cause: Incorrect Auth0 SDK implementation
+- Issue: Auth0 routes not properly handled by SDK v4
+- Root Cause: Route handler file contained only comments and empty export
 - Solution Applied:
-  - Updated `app/api/auth/[...auth0]/route.ts` to use `handleAuth()` from Auth0 SDK
-  - Updated `lib/auth0.ts` to use `initAuth0()` for proper SDK initialization
-  - Updated `middleware.ts` to use `withMiddlewareAuthRequired()` from Auth0
-  - Fixed login button to use correct route: `/api/auth/login`
+  - Updated `app/api/auth/[...auth0]/route.ts` to properly export `handleAuth()` from Auth0 SDK
 - Status: ✅ Fixed and verified
 - Verification:
-  - ✅ Route handler: Correctly exports `handleAuth()`
-  - ✅ Auth0 library: Correctly initializes with `initAuth0()`
-  - ✅ Middleware: Correctly uses `withMiddlewareAuthRequired()`
-  - ✅ Login button: Points to `/api/auth/login`
+  - ✅ Route handler: Correctly exports `GET = handleAuth()`
+  - ✅ Auth0 library: Correctly uses `new Auth0Client()` (auto-reads env vars)
+  - ✅ Middleware: Correctly uses `auth0.middleware(request)`
+  - ✅ Login button: Correctly points to `/auth/login`
   - ✅ Package.json: Has `@auth0/nextjs-auth0@^4.12.0` installed
 
 **Next Steps for Vercel Deployment:**
@@ -102,11 +99,12 @@ Project is in development phase with core authentication and database infrastruc
 
 ## Auth0 Integration Reference
 
-**SDK Setup:**
+**SDK Setup (v4):**
 
 - Install: `npm install @auth0/nextjs-auth0`
-- Client initialization in `lib/auth0.js` with authorization parameters
-- Middleware configuration for route protection
+- Client initialization: `new Auth0Client()` in `lib/auth0.ts` (auto-reads env vars)
+- Route handler: Export `GET = handleAuth()` in `[...auth0]/route.ts`
+- Middleware: Use `auth0.middleware(request)` for Next.js 15
 
 **Environment Variables:**
 
@@ -126,13 +124,13 @@ Project is in development phase with core authentication and database infrastruc
 - /api/auth/profile: User profile endpoint (returns user data)
 - /api/auth/access-token: Access token endpoint
 
-**Usage Patterns:**
+**Usage Patterns (v4):**
 
 - Server components: Use `auth0.getSession()` for user data
-- Client components: Use `useUser()` hook from @auth0/nextjs-auth0
-- Login: Link to `/api/auth/login` (SDK automatically redirects to Auth0)
-- Logout: Link to `/api/auth/logout` (SDK automatically handles logout)
-- Protected routes: Use `withMiddlewareAuthRequired()` in middleware.ts
+- Client components: Use `useUser()` hook from `@auth0/nextjs-auth0/client`
+- Login: Link to `/auth/login` (middleware handles routing)
+- Logout: Link to `/auth/logout` (middleware handles routing)
+- Protected routes: Middleware automatically handles authentication
 
 ## Next Steps
 
